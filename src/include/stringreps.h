@@ -2,6 +2,10 @@
 #define _STRREP_
 
 #include "randomgen.h"
+#include "parameters.h"
+#include "dv_tools.h"
+#include "ca.h"
+
 #define MAXLEN 300
 
 namespace strrep {
@@ -61,6 +65,12 @@ namespace strrep {
 			inline int T() {return(numbers[3]);};
 			inline int C() {return(numbers[4]);};
 			
+			//dissociation
+			void diss();
+			
+			//test for dissotioation
+			void dissotiation(double rand);
+			
 			//random walk
 			void operator >( Strrep* target){
 				if( target->role != empty ) std::cerr << "ERROR: Strep: during diffusion non-empty target given, target will be overwritten!" << std::endl; 
@@ -75,9 +85,54 @@ namespace strrep {
 					target->complex = this; //target's new complex is this cell'
 				}
 			}
+			
+			//complex formation
+			void operator +( Strrep* target){
+				double kassos[5] = {par_k_noasso, kasso_repl, kasso_endo, target->kasso_repl, target->kasso_endo};
+				
+				//roles
+				switch( dvtools::brokenStickVals(kassos, 5, -1, gsl_rng_uniform(r)) ) {
+					case 0:
+						return ;
+					case 1: // this connects to target as replicator
+						role=repl;
+						target->role=repl_template;
+						break;
+					case 2: // this connects to target as endonuclease
+						role=endo;
+						target->role=endo_template;
+						break;
+					case 3: // target connects to this as replicator
+						role=repl_template;
+						target->role=repl;
+						break;
+					case 4: // target connects to this as endonuclease
+						role=endo_template;
+						target->role=endo;
+						break;
+					default: 
+						std::cerr << "ERROR: brokenStickVals gave back unvalid choice in complex formation" << std::endl;
+						return ;
+				}
+				
+				//complex pointers
+				complex = target;
+				target->complex = this;
+				
+			}
+			
+			//endonucleation
+			void Clevage(Strrep* child);
+
+			//replication
+			int Replication(Strrep* child);
+			
 	};
 
-	
+	class Sca : public cadv::CellAut<Strrep> {
+		public:
+			void Update(int cell);
+	};
 	
 	
 }

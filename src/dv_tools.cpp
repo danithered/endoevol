@@ -18,11 +18,11 @@ int brokenStickVals(double *values, int noChoices, double sum, double random) {
 	int choice=0;
 	double cumulate=0.0;
 	
-// 	if(sum < 0) {
-// 		for(sum = choice = 0; choice < noChoices; choice++) {
-// 			sum += *(values + choice);
-// 		}
-// 	}
+ 	if(sum < 0) {
+ 		for(sum = choice = 0; choice < noChoices; choice++) {
+ 			sum += *(values + choice);
+ 		}
+ 	}
 	
 	for (choice = 0; choice < noChoices; choice++) {		
 		if (random < ((cumulate += *(values + choice)) / sum) ) {

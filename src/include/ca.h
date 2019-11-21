@@ -94,6 +94,8 @@ namespace cadv {
 /**/				std::cout << "Deconstructor Called" << std::endl;
 			}
 			
+			virtual void Update(int cell);
+			
 			//Functions
 			
 			
@@ -154,6 +156,11 @@ namespace cadv {
 			///gives back pos of neighbour no_neigh of cell
 			inline int neigh(int cell, int no_neigh, int no_nm) {
 				return neighbourhoods[no_nm] + no_neighbours[no_nm]*cell + no_neigh;
+			}
+			
+			///gives back pointer to a random neighbour except the cell itself
+			inline celltype* rneigh(int cell, int no_nm=0) {
+				return (matrix + *(neighbourhoods[no_nm] + no_neighbours[no_nm]*cell + gsl_rng_uniform_int(r, no_neighbours[no_nm] - 1) + 1) );
 			}
 			
 			///swaps two cells in the matrix
