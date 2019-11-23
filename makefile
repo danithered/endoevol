@@ -4,7 +4,8 @@ IDIR =./src/include
 ODIR=src/obj
 SRCDIR=src
 
-CC=g++
+CC=gcc
+CPPC=g++
 
 CFLAGS=-I$(IDIR) `pkg-config --cflags gsl`
 
@@ -19,11 +20,14 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 _OBJ_test = test.o 
 OBJ_test = $(patsubst %,$(ODIR)/%,$(_OBJ_test))
 
-$(ODIR)/%.o: $(SRCDIR)/%.cpp $(DEPS)
+$(ODIR)/%.o: $(SRCDIR)/%.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
+$(ODIR)/%.o: $(SRCDIR)/%.cpp $(DEPS)
+	$(CPPC) -c -o $@ $< $(CFLAGS)
+
 $(PROGNAME): $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+	$(CPPC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean
 
@@ -36,7 +40,7 @@ run:
 	./$(PROGNAME)  
 
 test: $(OBJ_test)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+	$(CPPC) -o $@ $^ $(CFLAGS) $(LIBS)
 	echo $(OBJ_test) $(CFLAGS) $(LIBS)
 	./test
 
