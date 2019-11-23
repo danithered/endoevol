@@ -18,15 +18,20 @@ int par_output_interval = 10;
 char par_pic_folder[255] = "movie\0";
 char par_ID[255] = "test\0";
 
-
+char **par_init_seqs;
+double *par_init_props;
+int par_init_no=0;
 
 //output parameters to file
 int paramsToFile(char* filename){
+	int i=0;
+	
 	// open a file in write mode.
 	std::fstream paramfile(filename, std::fstream::out);
 	
 //	std::cout << "Printing parameters to file: " << filename << std::endl;	
 	
+	paramfile << "maxlen " << MAXLEN << std::endl; 
 	paramfile << "par_length_dependence " << par_length_dependence << std::endl; 
 	paramfile << "par_death " <<  par_death  << std::endl;
 	paramfile << "par_substitution " << par_substitution << std::endl;
@@ -43,6 +48,14 @@ int paramsToFile(char* filename){
 	paramfile << "par_pic_folder " << par_pic_folder << std::endl;
 	paramfile << "par_ID " << par_ID << std::endl;
 	
+	paramfile << "par_init_no " << par_init_no << std::endl;
+	paramfile << "par_init_seqs ";
+	for(i=0; i < par_init_no; i++) paramfile << par_init_seqs[i] << " ";
+	paramfile << std::endl;
+	paramfile << "par_init_props ";
+	for(i=0; i < par_init_no; i++) paramfile << par_init_props[i] << " ";
+	paramfile << std::endl;
+	
 	paramfile.close();
 	return(0);
 }
@@ -51,7 +64,7 @@ int paramsToFile(char* filename){
 //parameter modifying function
 int Args(int argc, char **argv)
 {
-  int i;
+  int i, s;
   char option;
   //  char temp[BUFSIZE];
   /* parameters may be overridden here. */
@@ -188,6 +201,31 @@ int Args(int argc, char **argv)
 					return -1;
 				}
 				continue;
+				
+			case 'S':
+				if (++i == argc) return 1;
+				par_init_no = atoi(argv[i]);
+				if(par_init_no > 0 && i + 2*par_init_no < argc) {
+					par_init_props = new double [par_init_no];
+					par_init_seqs = new char* [par_init_no];
+					for(s = 0; s < par_init_no; s++){
+						par_init_props[s] = atof(argv[++i]);
+						if(par_init_props[s] < 0.0) {
+							std::cerr << "ERROR at reading argoments: trouble with proportions of initial sequences: it has to be non negative!" << std::endl;
+							return -2;
+						}
+						par_init_seqs[s] = new char [MAXLEN+1];
+						if(strlen(argv[++i]) > MAXLEN) {
+							std::cerr << "ERROR at reading argoments: trouble initial sequences: has to be shorter than " << MAXLEN << std::endl;
+						}
+						strcpy(par_init_seqs[s], argv[i]);
+					}
+				}
+				else {
+					std::cerr << "ERROR at reading argoments: trouble with initial sequences!" << std::endl;
+					return(-2);
+				}
+				
 			default:
 				std::cerr << "ERROR at reading argoments: not valid argoment!" << std::endl;
 				return -1;

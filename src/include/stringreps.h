@@ -11,7 +11,6 @@ extern "C" {
 #include "ca.h"
 #include "mycol.h"
 
-#define MAXLEN 300
 
 namespace strrep {
 	
@@ -78,6 +77,9 @@ namespace strrep {
 			
 			//get sequence as string
 			std::string getSeq();
+			
+			//set sequence from character string
+			void setSeq(char *charseq);
 			
 			//random walk
 			void operator >( Strrep* target){

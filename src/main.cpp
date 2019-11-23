@@ -43,10 +43,14 @@ int main(int argc, char *argv[]) {
 	
 	sprintf(output_file_name, "OUT/%s/output.txt\0", par_ID);
 	sprintf(pic_folder, "OUT/%s/%s\0", par_ID, par_pic_folder);
-	sprintf(command, "OUT/%s/parameters.txt\0", par_ID);
 	
 	//print parameters
+	sprintf(command, "OUT/%s/parameters.txt\0", par_ID);
 	paramsToFile(command);
+	
+	//write rng state
+	sprintf(command, "OUT/%s/rngsave.bin\0", par_ID);
+	//gsl_rng_fwrite (command, r);
 	
 	//start simulation
 	for(gen=0; gen < par_maxtime && strrep::Strrep::no_repl; gen++) {

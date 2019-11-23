@@ -62,7 +62,7 @@ int strrep::Strrep::align() {
 }
 
 void strrep::Strrep::del() {
-	no_repl--;
+	if(role != empty) no_repl--;
 	numbers[1] = numbers[2] = numbers[3] = numbers[4] = 0;
 	//for(int b = 0; b < MAXLEN; b++) {
 	//	seq[b] = 0;
@@ -359,6 +359,35 @@ std::string strrep::Strrep::getSeq(){
 	}
 	
 	return(charseq);
+}
+
+void strrep::Strrep::setSeq(char* charseq){
+	del();
+	for(length = 0; charseq[length] != '\0'; length++){
+		if(length > MAXLEN){
+			std::cerr << "too long initial sequence! Truncated" << std::endl;
+			break;
+		}
+		switch(charseq[length]){
+			case 'R':
+				seq[length]=strrep::R;
+				break;
+			case 'E':
+				seq[length]=strrep::E;
+				break;
+			case 'T':
+				seq[length]=strrep::T;
+				break;
+			case 'C':
+				seq[length]=strrep::C;
+				break;
+			default:
+				std::cerr << "ERROR: setSeq: non regular character found!" <<std::endl;
+				return;
+		}
+	}
+	if(length) no_repl++;
+	align();
 }
 
 int strrep::Sca::Output(std::string filename, int time){
