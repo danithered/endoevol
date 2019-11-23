@@ -75,8 +75,10 @@ namespace cadv {
 						layout = line;
 					}
 				}
+				
+				layout=square;
 			
-/**/				std::cout << "Basic Constructor Called" << std::endl;
+//				std::cout << "Basic Constructor Called" << std::endl;
 			}
 			
 			//Constructor 2
@@ -91,10 +93,10 @@ namespace cadv {
 				for(int i =0; i < neighbourhoods.size(); i++) {
 					delete [] (neighbourhoods.at(i));
 				}
-/**/				std::cout << "Deconstructor Called" << std::endl;
+//				std::cout << "Deconstructor Called" << std::endl;
 			}
 			
-			virtual void Update(int cell);
+			//virtual void Update(int cell);
 			
 			//Functions
 			
@@ -126,7 +128,7 @@ namespace cadv {
 			}
 			
 			///adds neighbourhood matrix
-			int neighAdd(double type) {
+			int neighAdd(double type=1) {
 				int* new_neigh;
 				new_neigh = neighInic(size, ncol, layout, type);
 				if( !new_neigh ) {
@@ -160,6 +162,9 @@ namespace cadv {
 			
 			///gives back pointer to a random neighbour except the cell itself
 			inline celltype* rneigh(int cell, int no_nm=0) {
+//				int pos = *(neighbourhoods[no_nm] + no_neighbours[no_nm]*cell + gsl_rng_uniform_int(r, no_neighbours[no_nm] - 1) + 1);
+//				std::cout << "search for random " << no_nm << " neighbour of cell " << cell << ": " << pos << std::endl;//				
+//				return (matrix + pos );
 				return (matrix + *(neighbourhoods[no_nm] + no_neighbours[no_nm]*cell + gsl_rng_uniform_int(r, no_neighbours[no_nm] - 1) + 1) );
 			}
 			

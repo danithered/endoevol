@@ -1,10 +1,15 @@
 #ifndef _STRREP_
 #define _STRREP_
 
+#include <fstream>
+extern "C" {
+#include "mypng.h"
+}
 #include "randomgen.h"
 #include "parameters.h"
 #include "dv_tools.h"
 #include "ca.h"
+#include "mycol.h"
 
 #define MAXLEN 300
 
@@ -71,6 +76,9 @@ namespace strrep {
 			//test for dissotioation
 			void dissotiation(double rand);
 			
+			//get sequence as string
+			std::string getSeq();
+			
 			//random walk
 			void operator >( Strrep* target){
 				if( target->role != empty ) std::cerr << "ERROR: Strep: during diffusion non-empty target given, target will be overwritten!" << std::endl; 
@@ -132,6 +140,33 @@ namespace strrep {
 	class Sca : public cadv::CellAut<Strrep> {
 		public:
 			void Update(int cell);
+			
+			int Output(std::string filename, int time);
+			
+			Sca(int size1=300, int size2=300, cadv::Ca_layout layout_type = cadv::Ca_layout::square){
+				nrow=size1;
+				ncol=size2;
+				
+				strrep::Strrep::no_repl = 0;
+				
+				size = cadv::grid_init(&matrix, size1, size2, layout_type);
+				
+				if(!size) layout = cadv::Ca_layout::empty;
+				if(size1==1 || size2==1){
+					if(size1==size2) {
+						layout = cadv::Ca_layout::single;
+					}
+					else {
+						layout = cadv::Ca_layout::line;
+					}
+				}
+			}
+			Sca(int size1, int size2, cadv::Ca_layout layout_type, Strrep* pool, double* probs, int no_choices){
+				CellAut(size1, size2, layout_type);
+				init(pool, probs, no_choices);
+			}
+			
+			int Picture(char* folder, int timestep);
 	};
 	
 	

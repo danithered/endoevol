@@ -8,12 +8,12 @@ CC=g++
 
 CFLAGS=-I$(IDIR) `pkg-config --cflags gsl`
 
-LIBS=-lm `pkg-config --libs gsl`
+LIBS=-lm `pkg-config --libs gsl` -lpng
 
-_DEPS = dv_tools.h ca.h randomgen.h stringreps.h parameters.h
+_DEPS = dv_tools.h ca.h randomgen.h stringreps.h parameters.h mycol.h mypng.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o dv_tools.o ca.o stringreps.o parameters.o
+_OBJ = main.o dv_tools.o ca.o stringreps.o parameters.o mycol.o mypng.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 _OBJ_test = test.o 

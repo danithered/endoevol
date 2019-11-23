@@ -16,7 +16,7 @@ strrep::Strrep::Strrep() {
 	
 	//generate sequence and det variables
 	no_repl++;
-	length = gsl_rng_uniform_int(r, MAXLEN);
+	length = gsl_rng_uniform_int(r, MAXLEN/2);
 	
 	if(length) {
 		//gen random sequence
@@ -71,9 +71,10 @@ void strrep::Strrep::del() {
 	length = 0;
 	role = empty;
 	krepl = kendo = kasso_repl = kasso_endo = 0;
-	if(complex != 0){
+	if(complex != NULL){
 		complex->complex = NULL;
-		complex =NULL;
+		complex->role = single;
+		complex = NULL;
 	}
 
 }
@@ -314,6 +315,8 @@ void strrep::Sca::Update(int cell) {
 	x = get(cell);
 	y = rneigh(cell);
 	
+//	std::cout << "update " << cell <<std::endl;
+
 	if(x->role == empty){ // x is empty
 		//enzymatic reaction
 		switch(y->role) {
@@ -342,4 +345,50 @@ void strrep::Sca::Update(int cell) {
 			x->dissotiation(gsl_rng_uniform(r));
 		}
 	}
+}
+
+std::string strrep::Strrep::getSeq(){
+	std::string charseq;
+	static char basechars[] = "NRETC";
+	
+	if(role == empty) return( (std::string) "N" );
+	
+	charseq = basechars[(int)seq[0]];
+	for(int b = 1; b < length; b++) {
+		charseq = charseq + basechars[(int)seq[b]];
+	}
+	
+	return(charseq);
+}
+
+int strrep::Sca::Output(std::string filename, int time){
+	// open a file in write mode.
+	std::fstream output(filename, std::fstream::out | std::fstream::app);
+	
+	for(int i = 0; i < size; i++ ){
+		output << time << "\t" << i << "\t" << matrix[i].role << "\t" << matrix[i].getSeq() << "\t" << matrix[i].krepl << "\t" << matrix[i].kendo << "\t" << matrix[i].kasso_repl << "\t" << matrix[i].kasso_endo << std::endl;
+	}
+
+	output.close();
+	return(0);
+}
+
+
+int strrep::Sca::Picture(char* folder, int timestep) {
+	unsigned char *data;
+
+	data = new unsigned char [3*ncol*nrow];
+	
+	for (int i=0; i < size; i++) {
+//		std::cout << i <<std::endl;
+		data[ i*3 ] = userCol[(int) matrix[i].role][0];
+		data[ i*3 + 1] = userCol[(int) matrix[i].role][1];
+		data[ i*3 + 2] = userCol[(int) matrix[i].role][2];
+//		std::cout << "pixel " << i << ": " << data[ i*3 ] << " " << data[ i*3 +1] << " " << data[ i*3 +2] << std::endl;	
+	}
+//	std::cout << "here" << std::endl;
+	PlanePNG(folder, timestep, ncol, nrow, size, data);
+//	std::cout << "picture captured" << std::endl;
+	delete [] (data);
+	return(0);
 }
