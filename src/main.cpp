@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 	
 	//variables
 	double diff = 0.0, decay = 0.0;
-	int what;
+	int what, gen=0;
 	char command[512], output_file_name[255], pic_folder[255];
 	
 	//init staff
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 	paramsToFile(command);
 	
 	//start simulation
-	for(int gen=0; gen < par_maxtime && strrep::Strrep::no_repl; gen++) {
+	for(gen=0; gen < par_maxtime && strrep::Strrep::no_repl; gen++) {
 /**/		std::cout << "gen " << gen << " with " << strrep::Strrep::no_repl << " replicators" << std::endl;		
 		
 		if(gen % par_output_interval == 0) aut.Output(output_file_name, gen);
@@ -79,7 +79,10 @@ int main(int argc, char *argv[]) {
 		}
 		
 	}
-		
+	
+	if(par_output_interval) aut.Output(output_file_name, gen);
+	if(par_movie_interval) aut.Picture(pic_folder, gen);
+
 
 	//randomszam generator lezarasa
 	gsl_rng_free(r);

@@ -363,13 +363,19 @@ std::string strrep::Strrep::getSeq(){
 
 int strrep::Sca::Output(std::string filename, int time){
 	// open a file in write mode.
-	std::fstream output(filename, std::fstream::out | std::fstream::app);
+	static int output_open=0;
+	static std::fstream output;
+	if(!output_open) {
+//		std::cout << "Output opened" << std::endl;		
+		output_open++;
+		output.open(filename, std::fstream::out | std::fstream::app);
+	}
 	
 	for(int i = 0; i < size; i++ ){
 		output << time << "\t" << i << "\t" << matrix[i].role << "\t" << matrix[i].getSeq() << "\t" << matrix[i].krepl << "\t" << matrix[i].kendo << "\t" << matrix[i].kasso_repl << "\t" << matrix[i].kasso_endo << std::endl;
 	}
 
-	output.close();
+	output.flush();
 	return(0);
 }
 
