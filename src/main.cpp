@@ -30,6 +30,9 @@ int main(int argc, char *argv[]) {
 	initColors();
 	strrep::Sca aut(par_ncol,par_nrow);
 	aut.neighAdd();
+	if(par_init_no) for(int c = 0; c < aut.size; c++) {
+		aut.get(c)->setSeq(par_init_seqs[ dvtools::brokenStickVals(par_init_props, par_init_no, 1, gsl_rng_uniform(r)) ]);
+	}
 	
 	//initialising output library tree
 	sprintf(command, "mkdir -p OUT");
