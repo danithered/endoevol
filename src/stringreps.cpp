@@ -205,7 +205,7 @@ int strrep::Strrep::Replication(Strrep* child) {
 
 	//deciding that the copy or the original stays in the parents place
 	child->length = length;
-	child->role = single;
+	
 	if(gsl_rng_uniform(r) < 0.5) { //the original stays
 		original = this;
 		copy = child;
@@ -268,6 +268,8 @@ int strrep::Strrep::Replication(Strrep* child) {
 	}
 	
 	no_repl++;
+	if(return_value) original->align();
+	
 /**/	std::cout << "replication happened" << std::endl;		
 	if(par_substitution) {
 		nmut= gsl_ran_binomial(r, par_substitution, copy->length);
