@@ -16,6 +16,7 @@ strrep::Strrep::Strrep() {
 	
 	//generate sequence and det variables
 	no_repl++;
+	role=single;
 	length = gsl_rng_uniform_int(r, MAXLEN/2);
 	
 	if(length) {
@@ -40,8 +41,14 @@ strrep::Strrep::~Strrep() {
 }
 
 int strrep::Strrep::align() {
-//	std::cout << "align() called" << std::endl;	
+//	std::cout << "align() called" << std::endl;
+	
 	numbers[1] = numbers[2] = numbers[3] = numbers[4] = 0;
+	if(length==0) {
+		role=empty;
+		return 0;
+	}
+	
 	for(int b = 0; b < length; b++) {
 		numbers[seq[b]]++;
 	}
@@ -124,9 +131,7 @@ void strrep::Strrep::Clevage(Strrep* child) {
 	diss();
 	
 	if(length < 2) {
-		seq[0] = N;
-		length = 0;
-		role = empty;
+		del();
 		return ;
 	}
 	
@@ -163,6 +168,9 @@ void strrep::Strrep::Clevage(Strrep* child) {
 	
 	align();
 	child->align();
+	no_repl++;
+	
+/**/	std::cout << "cleavage happened" << std::endl;	
 	
 }
 
@@ -197,6 +205,7 @@ int strrep::Strrep::Replication(Strrep* child) {
 
 	//deciding that the copy or the original stays in the parents place
 	child->length = length;
+	child->role = single;
 	if(gsl_rng_uniform(r) < 0.5) { //the original stays
 		original = this;
 		copy = child;
@@ -257,7 +266,8 @@ int strrep::Strrep::Replication(Strrep* child) {
 		copy->length = 0;
 		return(return_value);
 	}
-		
+	
+	no_repl++;
 /**/	std::cout << "replication happened" << std::endl;		
 	if(par_substitution) {
 		nmut= gsl_ran_binomial(r, par_substitution, copy->length);
@@ -325,26 +335,28 @@ void strrep::Sca::Update(int cell) {
 
 	if(x->role == empty){ // x is empty
 		//enzymatic reaction
+/**/		strrep::Strrep *co; co = y->complex;
+
 		switch(y->role) {
 			case repl: //replication from y's neighbour to x
-//				std::cout << "maybe copiing " << x->role << y->role << y->complex->role << std::endl;
+/**/				std::cout << strrep::Strrep::no_repl << " maybe copiing " << x->role << y->role << y->complex->role << std::endl;
 				if( gsl_rng_uniform(r) < y->krepl ) y->complex->Replication(x);
-//				std::cout << "replication happened " << x->role << " " << y->role << "" << y->complex << std::endl;				
+/**/				std::cout << strrep::Strrep::no_repl << " replication happened " << x->role << " " << y->role  << " " << co->role << std::endl;				
 				break;
 			case endo: //endonucleation from y's neighbour to x
 //				std::cout << "maybe cleaving " << x->role << y->role << y->complex->role << std::endl;
 				if( gsl_rng_uniform(r) < y->kendo ) y->complex->Clevage(x);
-//				std::cout << "cleavage happened " << x->role << " " << y->role << " " << y->complex << std::endl;
+//				std::cout << "cleavage happened " << x->role << " " << y->role << " " << co->role << std::endl;
 				break;
 			case endo_template: //endonucleation from y to x
 //				std::cout << "maybe cleaving " << x->role << " " << y->role << " " << y->complex->role << std::endl;
 				if( gsl_rng_uniform(r) < y->complex->kendo ) y->Clevage(x);
-//				std::cout << "cleavage happened " << x->role << " " << y->role << " " << y->complex << std::endl;
+//				std::cout << "cleavage happened " << x->role << " " << y->role << " " << co->role << std::endl;
 				break;
 			case repl_template: //replication from y to x
-//				std::cout << "maybe copiing " << x->role << y->role << y->complex->role << std::endl;
+/**/				std::cout << strrep::Strrep::no_repl << " maybe copiing " << x->role << y->role << y->complex->role << std::endl;
 				if( gsl_rng_uniform(r) < y->complex->krepl ) y->Replication(x);
-//				std::cout << "replication happened " << x->role << " " << y->role << " " << y->complex << std::endl;
+/**/				std::cout << strrep::Strrep::no_repl << " replication happened " << x->role << " " << y->role << " " << co->role << std::endl;
 		}
 	}
 	else { // x is not empty

@@ -55,11 +55,23 @@ int main(int argc, char *argv[]) {
 	sprintf(command, "OUT/%s/rngsave.bin\0", par_ID);
 	//gsl_rng_fwrite (command, r);
 	cout << "RNG seed: " << (int) timer << endl; 
+/**/	int single_count, empty_count, r_count, e_count, rt_count, et_count; 
 	
 	//start simulation
 	for(gen=0; gen < par_maxtime && strrep::Strrep::no_repl>1; gen++) {
 /**/		std::cout << "gen " << gen << " with " << strrep::Strrep::no_repl << " replicators" << std::endl;		
-		
+/**/		for(int z =single_count=empty_count=r_count=e_count=rt_count= et_count=0; z<aut.size; z++) {
+			switch(aut.get(z)->role){
+				case strrep::empty : empty_count++; break;
+				case strrep::single : single_count++; break;
+				case strrep::repl : r_count++; break;
+				case strrep::endo : e_count++; break;
+				case strrep::repl_template : rt_count++; break;
+				case strrep::endo_template : et_count++; break;
+			}
+		}
+		cout << "counts: empty: " << empty_count << " single: " << single_count << " repl: " << r_count << " endo: " << e_count << " repl_template: " << rt_count << " endo_template: " << et_count << endl;
+
 		if(gen % par_output_interval == 0) aut.Output(output_file_name, gen);
 		if(gen % par_movie_interval == 0) aut.Picture(pic_folder, gen);
 
@@ -75,7 +87,7 @@ int main(int argc, char *argv[]) {
 				if(aut.get(what)->role != strrep::empty && gsl_rng_uniform(r) < par_death  ) {
 //					std::cout << "tested" << std::endl;				
 					aut.get(what)->del();
-/**/					std::cout << "deleted" << std::endl;				
+//					std::cout << "deleted" << std::endl;				
 				}
 			}
 			
