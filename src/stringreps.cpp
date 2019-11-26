@@ -40,6 +40,7 @@ strrep::Strrep::~Strrep() {
 }
 
 int strrep::Strrep::align() {
+//	std::cout << "align() called" << std::endl;	
 	numbers[1] = numbers[2] = numbers[3] = numbers[4] = 0;
 	for(int b = 0; b < length; b++) {
 		numbers[seq[b]]++;
@@ -57,7 +58,7 @@ int strrep::Strrep::align() {
 	kendo = E() * length_activity[length];
 	kasso_repl = T() * length_activity[length];
 	kasso_endo = C() * length_activity[length];
-	
+//	std::cout << "align ended. role: " << role << ", length: " << length << ", krepl: " << krepl << ", kendo: " << kendo << ", kasso_repl: " << kasso_repl << ", kasso_endo: " << kasso_endo << std::endl << getSeq() << std::endl;	
 	return 0;
 }
 
@@ -119,6 +120,9 @@ void strrep::Strrep::dissotiation(double rand){
 void strrep::Strrep::Clevage(Strrep* child) {
 	int i = 0, till=0, cut=0;
 	
+	//breaking complex
+	diss();
+	
 	if(length < 2) {
 		seq[0] = N;
 		length = 0;
@@ -167,7 +171,7 @@ int strrep::Strrep::Replication(Strrep* child) {
 						array. The value stored in the chosen
 						element is the site of mutation */
 
-	int nmut; /* the number of mutations */
+	int nmut=0; /* the number of mutations */
 	int end; /* These represent the range of the site numbers of RNA
 			string from which we chose sites mutating */
 	int msite[MAXLEN]; /* A site number where we will insert a
@@ -186,13 +190,17 @@ int strrep::Strrep::Replication(Strrep* child) {
 	int pos_original, pos_copy;
 	
 	bases *copy_ptr;
+	
+	//breaking complex - it is neccessary to do here as the function has multiple exit points
+	diss();
+//	std::cout << "complex broke" << std::endl;
 
 	//deciding that the copy or the original stays in the parents place
 	child->length = length;
 	if(gsl_rng_uniform(r) < 0.5) { //the original stays
 		original = this;
 		copy = child;
-//		printf("Replication started. The original sequence stays\n%d\t%s\n", (int)strlen(original), original);
+//		std::cout << "Replication started. The original sequence stays" << std::endl;
 	}
 	else { //the copy stays
 		copy_ptr = child->seq;
@@ -202,7 +210,7 @@ int strrep::Strrep::Replication(Strrep* child) {
 		original = child;
 		copy = this;
 		return_value++;
-//		printf("Replication started. The original sequence goes to child cell\n%d\t%s\n", (int) strlen(original), original);
+//		std::cout << "Replication started. The original sequence goes to child cell" << std::endl;
 	}
 	
 	/* Replicate original to copy. We do mutation later. */
@@ -240,6 +248,7 @@ int strrep::Strrep::Replication(Strrep* child) {
 		}
 //		if(original[pos_original] == 'N') printf("ERROR: nonPerfectReplication: pos_original is %c!\n\t%s\n\t%s\n", original[pos_original], original, copy);
 	}
+//	std::cout << "insertion/deletion ended" << std::endl;	
 	
 	//test if it is 0 length
 	if(copy->length == 0) {
@@ -249,17 +258,14 @@ int strrep::Strrep::Replication(Strrep* child) {
 		return(return_value);
 	}
 		
-		
-	if(par_substitution == 0.) {
-		copy->align();
-		return return_value;
+/**/	std::cout << "replication happened" << std::endl;		
+	if(par_substitution) {
+		nmut= gsl_ran_binomial(r, par_substitution, copy->length);
 	}
-
-	/* Here, we calculate how many mutations occurs */
 	//nmut = (int) bnldev(par_substitution, copy->length);
-	nmut= gsl_ran_binomial(r, par_substitution, copy->length);
-
+	
 	if(nmut==0) {
+//		std::cout << "no substitution happened" << std::endl;
 		copy->align();
 		return return_value;
 	}
@@ -321,16 +327,24 @@ void strrep::Sca::Update(int cell) {
 		//enzymatic reaction
 		switch(y->role) {
 			case repl: //replication from y's neighbour to x
+//				std::cout << "maybe copiing " << x->role << y->role << y->complex->role << std::endl;
 				if( gsl_rng_uniform(r) < y->krepl ) y->complex->Replication(x);
+//				std::cout << "replication happened " << x->role << " " << y->role << "" << y->complex << std::endl;				
 				break;
 			case endo: //endonucleation from y's neighbour to x
+//				std::cout << "maybe cleaving " << x->role << y->role << y->complex->role << std::endl;
 				if( gsl_rng_uniform(r) < y->kendo ) y->complex->Clevage(x);
+//				std::cout << "cleavage happened " << x->role << " " << y->role << " " << y->complex << std::endl;
 				break;
 			case endo_template: //endonucleation from y to x
+//				std::cout << "maybe cleaving " << x->role << " " << y->role << " " << y->complex->role << std::endl;
 				if( gsl_rng_uniform(r) < y->complex->kendo ) y->Clevage(x);
+//				std::cout << "cleavage happened " << x->role << " " << y->role << " " << y->complex << std::endl;
 				break;
 			case repl_template: //replication from y to x
+//				std::cout << "maybe copiing " << x->role << y->role << y->complex->role << std::endl;
 				if( gsl_rng_uniform(r) < y->complex->krepl ) y->Replication(x);
+//				std::cout << "replication happened " << x->role << " " << y->role << " " << y->complex << std::endl;
 		}
 	}
 	else { // x is not empty

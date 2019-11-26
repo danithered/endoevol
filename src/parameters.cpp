@@ -1,19 +1,19 @@
 #include "parameters.h" 
 
 double par_length_dependence = -0.05;
-double par_death = 0.5;
+double par_death = 0.1;
 double par_substitution = 0.5;
 double par_insertion = 0.1;
 double par_deletion = 0.1;
 double par_k_noasso = 0.1;
-double par_decay_rate = 5;
+double par_decay_rate = 1;
 double par_diffusion_rate = 1;
 
-int par_maxtime = 100;
-int par_ncol = 300;
-int par_nrow = 300;
-int par_movie_interval = 1;
-int par_output_interval = 10;
+int par_maxtime = 100000;
+int par_ncol = 512;
+int par_nrow = 512;
+int par_movie_interval = 10;
+int par_output_interval = 100;
 
 char par_pic_folder[255] = "movie\0";
 char par_ID[255] = "test\0";
@@ -225,6 +225,7 @@ int Args(int argc, char **argv)
 					std::cerr << "ERROR at reading argoments: trouble with initial sequences!" << std::endl;
 					return(-2);
 				}
+				continue;
 				
 			default:
 				std::cerr << "ERROR at reading argoments: not valid argoment!" << std::endl;

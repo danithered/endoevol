@@ -1,5 +1,7 @@
 #include "dv_tools.h"
 
+#include <iostream>
+
 namespace dvtools {
 	
 int brokenStickVals(double *values, int noChoices, double sum, double random) {
@@ -31,7 +33,9 @@ int brokenStickVals(double *values, int noChoices, double sum, double random) {
 		}
 //		else printf("%f/%f <= %f, so choice is NOT %d\n", cumulate, sum, random, choice);
 	}
-//	printf("brokenStickVals: some error, maybe sum is not valid\n");	
+/**/	std::cerr << "brokenStickVals: some error, maybe sum (" << sum << ") is not valid" << std::endl;
+/**/	for(choice=0; choice < noChoices; choice++) std::cerr << choice << ". choice: " << values[choice] << std::endl;
+
 	return(-1);
 }
  
