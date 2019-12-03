@@ -23,20 +23,23 @@ int brokenStickVals(double *values, int noChoices, double sum, double random) {
  	if(sum < 0) {
  		for(sum = choice = 0; choice < noChoices; choice++) {
  			sum += *(values + choice);
+//			std::cout << "calculating sum: + " << *(values + choice) << " = " << sum << std::endl;			
  		}
  	}
 	
+	if(sum <= 0) return -1;
+	
 	for (choice = 0; choice < noChoices; choice++) {		
 		if (random < ((cumulate += *(values + choice)) / sum) ) {
-//			printf("%f/%f > %f, so choice is: %d\n", cumulate, sum, random, choice);
+//			std::cout << cumulate << "/" << sum << ">" << random << ", so choice is: " << choice << std::endl;
 			return(choice);
 		}
-//		else printf("%f/%f <= %f, so choice is NOT %d\n", cumulate, sum, random, choice);
+//		else std::cout << cumulate << "/" << sum << "<=" << random << ", so choice is NOT" << choice << std::endl;
 	}
-/**/	std::cerr << "brokenStickVals: some error, maybe sum (" << sum << ") is not valid" << std::endl;
-/**/	for(choice=0; choice < noChoices; choice++) std::cerr << choice << ". choice: " << values[choice] << std::endl;
+//	std::cerr << "brokenStickVals: some error, maybe sum (" << sum << ") is not valid" << std::endl;
+//	for(choice=0; choice < noChoices; choice++) std::cerr << choice << ". choice: " << values[choice] << std::endl;
 
-	return(-1);
+	return(-2);
 }
  
 

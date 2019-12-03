@@ -157,7 +157,7 @@ namespace cadv {
 			
 			///gives back pos of neighbour no_neigh of cell
 			inline int neigh(int cell, int no_neigh, int no_nm) {
-				return neighbourhoods[no_nm] + no_neighbours[no_nm]*cell + no_neigh;
+				return *(neighbourhoods[no_nm] + no_neighbours[no_nm]*cell + no_neigh);
 			}
 			
 			///gives back pointer to a random neighbour except the cell itself

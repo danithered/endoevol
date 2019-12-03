@@ -54,7 +54,7 @@ int strrep::Strrep::align() {
 	}
 	
 	if( R() + E() + C() + T() != length ) {
-		std::cerr << "Something went wrong during alignment!" << std::endl;
+		std::cerr << "Something went wrong during alignment!" << std::endl << R() << "+" << E() << "+" << C() << "+" << T() << " != " << length << " of seq" << std::endl << getSeq() << std::endl;
 		return(1);
 	}
 	
@@ -79,23 +79,26 @@ void strrep::Strrep::del() {
 	length = 0;
 	role = empty;
 	krepl = kendo = kasso_repl = kasso_endo = 0;
+//	std::cout << "del" << std::endl;
 	if(complex != NULL){
 		complex->complex = NULL;
 		complex->role = single;
 		complex = NULL;
 	}
+//	std::cout << "etion" << std::endl;
 
 }
 
 void strrep::Strrep::set_length_activity(double beta) {
 	for (int l = 0; l < MAXLEN; l++) {
-		length_activity[l] = (1 - exp(beta * l)) / l;
+		length_activity[l] = (1 - exp(beta * (double) l)) / (double) l;
 	}
 }
 
 void strrep::Strrep::diss() {
 	//dissoc partner
 	complex->complex = NULL;
+
 	if(complex->role != empty) complex->role = single;
 	
 	//dissoc cell
@@ -170,7 +173,7 @@ void strrep::Strrep::Clevage(Strrep* child) {
 	child->align();
 	no_repl++;
 	
-/**/	std::cout << "cleavage happened" << std::endl;	
+//	std::cout << "cleavage happened" << std::endl;	
 	
 }
 
@@ -228,7 +231,7 @@ int strrep::Strrep::Replication(Strrep* child) {
 		if(gsl_rng_uniform(r) < par_deletion) {
 			if(gsl_rng_uniform(r) < par_insertion) { //deletion and insertion
 				if(pos_copy >= MAXLEN) {std::cerr << "ERROR (nonPerfectReplication): reached max length!" << std::endl; break;} //check if copy is too long
-				copy->seq[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 4) + 1);
+				copy->seq[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 1)*2 + 1);
 			}
 			else {
 				copy->length--;
@@ -240,11 +243,11 @@ int strrep::Strrep::Replication(Strrep* child) {
 				if( gsl_rng_uniform(r) < 0.5) { // ...to the right
 					copy->seq[pos_copy++] = original->seq[pos_original];
 //					if(copy[pos_copy-1] == '\0') printf("ERROR: nonPerfectReplication: RNAc2cc has found a non RNA charaster (%c) during inserting right (%d)!\n%d\t%s\n%d\t%s\n", original[pos_original], length, (int)strlen(original), original, (int)strlen(copy), copy);
-					copy->seq[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 4) + 1);
+					copy->seq[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 1)*2 + 1);
 					copy->length++;
 				}
 				else { // ...to the left
-					copy->seq[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 4) + 1);
+					copy->seq[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 1)*2 + 1);
 					copy->seq[pos_copy++] = original->seq[pos_original];
 //					if(copy[pos_copy-1] == '\0') printf("ERROR: nonPerfectReplication: RNAc2cc has found a non RNA charaster (%c) during inserting left (%d)!\n%d\t%s\n%d\t%s\n", original[pos_original], length, (int)strlen(original), original, (int)strlen(copy), copy);
 					copy->length++;
@@ -270,7 +273,7 @@ int strrep::Strrep::Replication(Strrep* child) {
 	no_repl++;
 	if(return_value) original->align();
 	
-/**/	std::cout << "replication happened" << std::endl;		
+//	std::cout << "replication happened" << std::endl;		
 	if(par_substitution) {
 		nmut= gsl_ran_binomial(r, par_substitution, copy->length);
 	}
@@ -318,9 +321,11 @@ int strrep::Strrep::Replication(Strrep* child) {
 	
 	for(i=0;i<nmut;i++){
 		original_base = (int) copy->seq[msite[i]];
-		mint = gsl_rng_uniform_int(r, 3) + 1 ; 
-		original_base = (original_base + mint) % 4;
-		copy->seq[msite[i]] = static_cast<strrep::bases>( original_base?original_base:4 );
+		if(original_base == strrep::R) copy->seq[msite[i]] = strrep::T;
+		else copy->seq[msite[i]] = strrep::R;
+		//mint = gsl_rng_uniform_int(r, 3) + 1 ; 
+		//original_base = (original_base + mint) % 4;
+		//copy->seq[msite[i]] = static_cast<strrep::bases>( original_base?original_base:4 );
 	}
 	
 	copy->align();
@@ -337,13 +342,13 @@ void strrep::Sca::Update(int cell) {
 
 	if(x->role == empty){ // x is empty
 		//enzymatic reaction
-/**/		strrep::Strrep *co; co = y->complex;
+//		strrep::Strrep *co; co = y->complex;
 
 		switch(y->role) {
 			case repl: //replication from y's neighbour to x
-/**/				std::cout << strrep::Strrep::no_repl << " maybe copiing " << x->role << y->role << y->complex->role << std::endl;
+//				std::cout << strrep::Strrep::no_repl << " maybe copiing " << x->role << y->role << y->complex->role << std::endl;
 				if( gsl_rng_uniform(r) < y->krepl ) y->complex->Replication(x);
-/**/				std::cout << strrep::Strrep::no_repl << " replication happened " << x->role << " " << y->role  << " " << co->role << std::endl;				
+//				std::cout << strrep::Strrep::no_repl << " replication happened " << x->role << " " << y->role  << " " << co->role << std::endl;				
 				break;
 			case endo: //endonucleation from y's neighbour to x
 //				std::cout << "maybe cleaving " << x->role << y->role << y->complex->role << std::endl;
@@ -356,9 +361,9 @@ void strrep::Sca::Update(int cell) {
 //				std::cout << "cleavage happened " << x->role << " " << y->role << " " << co->role << std::endl;
 				break;
 			case repl_template: //replication from y to x
-/**/				std::cout << strrep::Strrep::no_repl << " maybe copiing " << x->role << y->role << y->complex->role << std::endl;
+//				std::cout << strrep::Strrep::no_repl << " maybe copiing " << x->role << y->role << y->complex->role << std::endl;
 				if( gsl_rng_uniform(r) < y->complex->krepl ) y->Replication(x);
-/**/				std::cout << strrep::Strrep::no_repl << " replication happened " << x->role << " " << y->role << " " << co->role << std::endl;
+//				std::cout << strrep::Strrep::no_repl << " replication happened " << x->role << " " << y->role << " " << co->role << std::endl;
 		}
 	}
 	else { // x is not empty
@@ -366,12 +371,26 @@ void strrep::Sca::Update(int cell) {
 			if( y->role == single) { //x and y are single molecules
 				//complex formation
 				*x + y;
+//				std::cout << "Comlex formation" << std::endl;
 			}
 		}
 		else { // x is a complex molecule
 			//complex dissotiation
-			x->dissotiation(gsl_rng_uniform(r));
+			if( gsl_rng_uniform(r) < 0.25 ) x->dissotiation(gsl_rng_uniform(r));
+//			std::cout << "Comlex dissotiation" << std::endl;
 		}
+	}
+}
+
+std::string strrep::Strrep::getRole(){
+	switch(role){
+		case strrep::empty: return("empty\0");
+		case strrep::single: return("single\0");
+		case strrep::repl: return("repl\0");
+		case strrep::endo: return("endo\0");
+		case strrep::repl_template: return("repl_template\0");
+		case strrep::endo_template: return("endo_template\0");
+		default: return("NA\0");
 	}
 }
 
@@ -429,7 +448,7 @@ int strrep::Sca::Output(std::string filename, int time){
 	}
 	
 	for(int i = 0; i < size; i++ ){
-		output << time << "\t" << i << "\t" << matrix[i].role << "\t" << matrix[i].getSeq() << "\t" << matrix[i].krepl << "\t" << matrix[i].kendo << "\t" << matrix[i].kasso_repl << "\t" << matrix[i].kasso_endo << std::endl;
+		if(matrix[i].role) output << "t_" << time << "\t" << i << "\t" << matrix[i].getRole() << "\t" << matrix[i].getSeq() << "\t" << matrix[i].krepl << "\t" << matrix[i].kendo << "\t" << matrix[i].kasso_repl << "\t" << matrix[i].kasso_endo << std::endl;
 	}
 
 	output.flush();

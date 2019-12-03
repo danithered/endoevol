@@ -13,7 +13,7 @@ extern double par_substitution;
 extern double par_insertion;
 extern double par_deletion;
 extern double par_k_noasso;
-extern double par_decay_rate;
+//extern double par_decay_rate;
 extern double par_diffusion_rate;
 
 extern int par_maxtime;

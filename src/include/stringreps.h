@@ -78,47 +78,77 @@ namespace strrep {
 			//get sequence as string
 			std::string getSeq();
 			
+			//get role as string
+			std::string getRole();
+			
 			//set sequence from character string
 			void setSeq(char *charseq);
 			
+			//copy to
+			void copyTo(Strrep *target) {
+				int b=0;
+				
+				target->length=length;
+				for(b = 0; b < length; b++) {
+					target->seq[b] = seq[b];
+				}
+				
+				for(b=0; b<5; b++){
+					target->numbers[b] = numbers[b];
+				}
+			
+				target->complex = complex; 			// who is in complex with this replicator
+				target->role = role;
+				target->krepl = krepl;
+				target->kasso_repl = kasso_repl;
+				target->kasso_endo = kasso_endo;
+			}
+			
 			//random walk
-			void operator >( Strrep* target){
-				if( target->role != empty ) std::cerr << "ERROR: Strep: during diffusion non-empty target given, target will be overwritten!" << std::endl; 
-				*target = *this;
+			void diff(Strrep *target){
+				
+				if( target->role != empty || role==empty ) return ; 
+				
+				copyTo(target);
 				if(complex == NULL) {
 					this->del();
+					no_repl++; //del decreased number, while it did not changed
+//					std::cout << "non complex molecule moved" << std::endl;					
 				}
 				else {
-					*this=*complex; //pull complex to this position
-					target->complex->del(); //delete complex
+					complex->copyTo(this); //pull complex to this position
+					target->complex->role = empty;
+					target->complex->complex = NULL;
+					target->complex->del(); //delete complex. Target is still pointing towards the complex
 					complex=target; //this cell's new complex is target
 					target->complex = this; //target's new complex is this cell'
+//					std::cout << "complex molecule moved" << std::endl;
 				}
 			}
 			
 			//complex formation
 			void operator +( Strrep* target){
-				double kassos[5] = {par_k_noasso, kasso_repl, kasso_endo, target->kasso_repl, target->kasso_endo};
+				double kassos[4] = {target->R()?kasso_repl:0, target->E()?kasso_endo:0, R()?target->kasso_repl:0, E()?target->kasso_endo:0};
 				
 				//roles
-				switch( dvtools::brokenStickVals(kassos, 5, -1, gsl_rng_uniform(r)) ) {
-					case 0:
+				switch( dvtools::brokenStickVals(kassos, 4, 2, gsl_rng_uniform(r)) ) {
+					case -2: case -1:
 						return ;
-					case 1: // this connects to target as replicator
-						role=repl;
-						target->role=repl_template;
-						break;
-					case 2: // this connects to target as endonuclease
-						role=endo;
-						target->role=endo_template;
-						break;
-					case 3: // target connects to this as replicator
+					case 0: // target connects to this as replicator
 						role=repl_template;
 						target->role=repl;
 						break;
-					case 4: // target connects to this as endonuclease
+					case 1: // target connects to this as endonuclease
 						role=endo_template;
 						target->role=endo;
+						break;
+					case 2: // this connects to target as replicator
+						role=repl;
+						target->role=repl_template;
+						break;
+					case 3: // this connects to target as endonuclease
+						role=endo;
+						target->role=endo_template;
 						break;
 					default: 
 						std::cerr << "ERROR: brokenStickVals gave back unvalid choice in complex formation" << std::endl;

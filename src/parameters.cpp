@@ -2,11 +2,11 @@
 
 double par_length_dependence = -0.05;
 double par_death = 0.1;
-double par_substitution = 0.5;
-double par_insertion = 0.1;
-double par_deletion = 0.1;
+double par_substitution = 0;
+double par_insertion = 0;
+double par_deletion = 0;
 double par_k_noasso = 0.1;
-double par_decay_rate = 1;
+//double par_decay_rate = 1;
 double par_diffusion_rate = 1;
 
 int par_maxtime = 100000;
@@ -38,7 +38,7 @@ int paramsToFile(char* filename){
 	paramfile << "par_insertion " << par_insertion << std::endl;
 	paramfile << "par_deletion " << par_deletion << std::endl;
 	paramfile << "par_k_noasso " << par_k_noasso << std::endl;
-	paramfile << "par_decay_rate " << par_decay_rate << std::endl;
+	//paramfile << "par_decay_rate " << par_decay_rate << std::endl;
 	paramfile << "par_diffusion_rate " << par_diffusion_rate << std::endl;
 	paramfile << "par_maxtime " << par_maxtime << std::endl;
 	paramfile << "par_ncol " << par_ncol << std::endl;
@@ -123,14 +123,14 @@ int Args(int argc, char **argv)
 				}
 				continue;
 			
-			case 'x':
-				if (++i == argc) return 1;
-				par_decay_rate = atof(argv[i]);
-				if(par_decay_rate < 0) {
-					std::cerr << "ERROR at reading argoments: option " << option << ": par_decay_rate cant be negative!" << std::endl;
-					return(-1);
-				}
-				continue;
+// 			case 'x':
+// 				if (++i == argc) return 1;
+// 				par_decay_rate = atof(argv[i]);
+// 				if(par_decay_rate < 0) {
+// 					std::cerr << "ERROR at reading argoments: option " << option << ": par_decay_rate cant be negative!" << std::endl;
+// 					return(-1);
+// 				}
+// 				continue;
 			
 			case 'D':
 				if (++i == argc) return 1;
