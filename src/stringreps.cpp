@@ -226,7 +226,7 @@ int strrep::Strrep::Replication(Strrep* child) {
 	}
 	
 	/* Replicate original to copy. We do mutation later. */
-	for(pos_original = length-1, pos_copy = 0; pos_original >= 0; pos_original--){
+	for(pos_original = 0, pos_copy = 0; pos_original < original->length ; pos_original--){
 		//is there a deletion
 		if(gsl_rng_uniform(r) < par_deletion) {
 			if(gsl_rng_uniform(r) < par_insertion) { //deletion and insertion

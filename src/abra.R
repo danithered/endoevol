@@ -1,4 +1,4 @@
-datadir <- "/home/danielred/Programs/endoevol/OUT/test_nodiff/"
+datadir <- "/home/danielred/Programs/endoevol/OUT/TR_sub_2/"
 
 library(ggplot2)
 getPar <- function(parfile, parname){
@@ -7,7 +7,7 @@ getPar <- function(parfile, parname){
 setwd(datadir)
 #death = getPar("parameters.txt", "par_death")
 data <- read.table("output.txt", header=F, sep="\t", col.names= c("ttime", "cell", "role", "seq", "krepl", "kendo", "kT", "kC"), colClasses = c("character", NA, "factor", "character", NA, NA, NA, NA))
-data$ttime <- as.numeric(substring(data$ttime, 2))
+data$ttime <- as.numeric(substring(data$ttime, 3))
 data <- cbind(data, length=nchar(data$seq))
 str(data)
 atlagadat <- data.frame(
@@ -55,4 +55,7 @@ plot(data$ttime, data$length)
 max(apply(data[,c("krepl","kendo", "kT", "kC")], 1, sum))
 max(data[,c("krepl","kendo", "kT", "kC")])
 
-hist(data[data$ttime==2000,"kC"])
+hist(data[data$ttime==max(data$ttime),"kC"])
+hist(data[data$ttime==max(data$ttime),"kT"])
+hist(data[data$ttime==max(data$ttime),"krepl"])
+hist(data[data$ttime==max(data$ttime),"length"])
