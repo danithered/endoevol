@@ -12,7 +12,8 @@ extern double par_death;
 extern double par_substitution;
 extern double par_insertion;
 extern double par_deletion;
-extern double par_k_noasso;
+extern double par_dissotiation;
+//extern double par_k_noasso;
 //extern double par_decay_rate;
 extern double par_diffusion_rate;
 

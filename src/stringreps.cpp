@@ -376,7 +376,8 @@ void strrep::Sca::Update(int cell) {
 		}
 		else { // x is a complex molecule
 			//complex dissotiation
-			if( gsl_rng_uniform(r) < 0.25 ) x->dissotiation(gsl_rng_uniform(r));
+			if( gsl_rng_uniform(r) < par_dissotiation ) x->diss();
+			//x->dissotiation(gsl_rng_uniform(r));
 //			std::cout << "Comlex dissotiation" << std::endl;
 		}
 	}

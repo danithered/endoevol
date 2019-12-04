@@ -128,7 +128,7 @@ namespace strrep {
 			
 			//complex formation
 			void operator +( Strrep* target){
-				double kassos[4] = {target->R()?kasso_repl:0, target->E()?kasso_endo:0, R()?target->kasso_repl:0, E()?target->kasso_endo:0};
+/**/				double kassos[4] = {target->R()?kasso_repl:0, target->E()?kasso_endo:0, R()?target->kasso_repl:0, E()?target->kasso_endo:0};
 				
 				//roles
 				switch( dvtools::brokenStickVals(kassos, 4, 2, gsl_rng_uniform(r)) ) {
@@ -154,7 +154,34 @@ namespace strrep {
 						std::cerr << "ERROR: brokenStickVals gave back unvalid choice in complex formation" << std::endl;
 						return ;
 				}
+/*/				
+				double kassos[5] = {0.1, target->R()?kasso_repl:0, target->E()?kasso_endo:0, R()?target->kasso_repl:0, E()?target->kasso_endo:0};
 				
+				//roles
+				switch( dvtools::brokenStickVals(kassos, 5, -1, gsl_rng_uniform(r)) ) {
+					case -2: case -1: case 0:
+						return ;
+					case 1: // target connects to this as replicator
+						role=repl_template;
+						target->role=repl;
+						break;
+					case 2: // target connects to this as endonuclease
+						role=endo_template;
+						target->role=endo;
+						break;
+					case 3: // this connects to target as replicator
+						role=repl;
+						target->role=repl_template;
+						break;
+					case 4: // this connects to target as endonuclease
+						role=endo;
+						target->role=endo_template;
+						break;
+					default: 
+						std::cerr << "ERROR: brokenStickVals gave back unvalid choice in complex formation" << std::endl;
+						return ;
+				}
+/**/				
 				//complex pointers
 				complex = target;
 				target->complex = this;
