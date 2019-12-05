@@ -16,6 +16,7 @@ extern double par_dissotiation;
 //extern double par_k_noasso;
 //extern double par_decay_rate;
 extern double par_diffusion_rate;
+extern double par_backmut;
 
 extern int par_maxtime;
 extern int par_ncol;

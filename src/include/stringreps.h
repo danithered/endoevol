@@ -15,7 +15,7 @@ extern "C" {
 namespace strrep {
 	
 	enum repl_types {empty=0, single=1, repl=2, endo=3, repl_template=4, endo_template=5};
-	enum bases {N=0, R=1, E=2, T=3, C=4};
+	enum bases {N=0, R=1, E=2, T=3, C=4, B=5};
 	
 	class Strrep {
 		public:
@@ -27,7 +27,7 @@ namespace strrep {
 			//for individual cells
 			bases* seq;
 			
-			int numbers[5];		// the number of different bases in the sequence. N:0, R:1, E:2, T:3, C:4
+			int numbers[6];		// the number of different bases in the sequence. N:0, R:1, E:2, T:3, C:4, B:5
 			//int R;
 			//int E;
 			//int T;
@@ -68,6 +68,7 @@ namespace strrep {
 			inline int E() {return(numbers[2]);};
 			inline int T() {return(numbers[3]);};
 			inline int C() {return(numbers[4]);};
+			inline int B() {return(numbers[5]);};
 			
 			//dissociation
 			void diss();

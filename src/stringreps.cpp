@@ -11,7 +11,7 @@ strrep::Strrep::Strrep() {
 	seq = new bases[MAXLEN];
 	
 	//init vars
-	numbers[0] = numbers[1] = numbers[2] = numbers[3] = numbers[4] = 0;
+	numbers[0] = numbers[1] = numbers[2] = numbers[3] = numbers[4] = numbers[5] = 0;
 	complex = NULL;
 	
 	//generate sequence and det variables
@@ -43,7 +43,7 @@ strrep::Strrep::~Strrep() {
 int strrep::Strrep::align() {
 //	std::cout << "align() called" << std::endl;
 	
-	numbers[1] = numbers[2] = numbers[3] = numbers[4] = 0;
+	numbers[1] = numbers[2] = numbers[3] = numbers[4] = numbers[5] = 0;
 	if(length==0) {
 		role=empty;
 		return 0;
@@ -53,7 +53,7 @@ int strrep::Strrep::align() {
 		numbers[seq[b]]++;
 	}
 	
-	if( R() + E() + C() + T() != length ) {
+	if( R() + E() + C() + T() + B() != length ) {
 		std::cerr << "Something went wrong during alignment!" << std::endl << R() << "+" << E() << "+" << C() << "+" << T() << " != " << length << " of seq" << std::endl << getSeq() << std::endl;
 		return(1);
 	}
@@ -71,7 +71,7 @@ int strrep::Strrep::align() {
 
 void strrep::Strrep::del() {
 	if(role != empty) no_repl--;
-	numbers[1] = numbers[2] = numbers[3] = numbers[4] = 0;
+	numbers[1] = numbers[2] = numbers[3] = numbers[4] = numbers[5] = 0;
 	//for(int b = 0; b < MAXLEN; b++) {
 	//	seq[b] = 0;
 	//}
@@ -226,12 +226,13 @@ int strrep::Strrep::Replication(Strrep* child) {
 	}
 	
 	/* Replicate original to copy. We do mutation later. */
-	for(pos_original = 0, pos_copy = 0; pos_original < original->length ; pos_original--){
+	for(pos_original = 0, pos_copy = 0; pos_original < original->length ; pos_original++){
 		//is there a deletion
 		if(gsl_rng_uniform(r) < par_deletion) {
 			if(gsl_rng_uniform(r) < par_insertion) { //deletion and insertion
 				if(pos_copy >= MAXLEN) {std::cerr << "ERROR (nonPerfectReplication): reached max length!" << std::endl; break;} //check if copy is too long
-				copy->seq[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 1)*2 + 1);
+				copy->seq[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 3)*2 + 1);
+//				std::cout << "insertion of char " << copy->seq[pos_copy -1] << std::endl;
 			}
 			else {
 				copy->length--;
@@ -243,11 +244,13 @@ int strrep::Strrep::Replication(Strrep* child) {
 				if( gsl_rng_uniform(r) < 0.5) { // ...to the right
 					copy->seq[pos_copy++] = original->seq[pos_original];
 //					if(copy[pos_copy-1] == '\0') printf("ERROR: nonPerfectReplication: RNAc2cc has found a non RNA charaster (%c) during inserting right (%d)!\n%d\t%s\n%d\t%s\n", original[pos_original], length, (int)strlen(original), original, (int)strlen(copy), copy);
-					copy->seq[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 1)*2 + 1);
+					copy->seq[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 3)*2 + 1);
+//					std::cout << "insertion of char " << copy->seq[pos_copy -1] << std::endl;
 					copy->length++;
 				}
 				else { // ...to the left
-					copy->seq[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 1)*2 + 1);
+					copy->seq[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 3)*2 + 1);
+//					std::cout << "insertion of char " << copy->seq[pos_copy -1] << std::endl;
 					copy->seq[pos_copy++] = original->seq[pos_original];
 //					if(copy[pos_copy-1] == '\0') printf("ERROR: nonPerfectReplication: RNAc2cc has found a non RNA charaster (%c) during inserting left (%d)!\n%d\t%s\n%d\t%s\n", original[pos_original], length, (int)strlen(original), original, (int)strlen(copy), copy);
 					copy->length++;
@@ -321,8 +324,17 @@ int strrep::Strrep::Replication(Strrep* child) {
 	
 	for(i=0;i<nmut;i++){
 		original_base = (int) copy->seq[msite[i]];
-		if(original_base == strrep::R) copy->seq[msite[i]] = strrep::T;
-		else copy->seq[msite[i]] = strrep::R;
+		if(original_base == strrep::B){
+			if(gsl_rng_uniform(r) < par_backmut){
+				copy->seq[msite[i]] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 2)*2 + 1);
+			}
+		}
+		else if(original_base == strrep::R) {
+			copy->seq[msite[i]] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 2)*2 + 3);
+		}
+		else {
+			copy->seq[msite[i]] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 2)*4 + 1);
+		}
 		//mint = gsl_rng_uniform_int(r, 3) + 1 ; 
 		//original_base = (original_base + mint) % 4;
 		//copy->seq[msite[i]] = static_cast<strrep::bases>( original_base?original_base:4 );
@@ -397,7 +409,7 @@ std::string strrep::Strrep::getRole(){
 
 std::string strrep::Strrep::getSeq(){
 	std::string charseq;
-	static char basechars[] = "NRETC";
+	static char basechars[] = "NRETCB";
 	
 	if(role == empty) return( (std::string) "N" );
 	
@@ -428,6 +440,9 @@ void strrep::Strrep::setSeq(char* charseq){
 				break;
 			case 'C':
 				seq[length]=strrep::C;
+				break;
+			case 'B':
+				seq[length]=strrep::B;
 				break;
 			default:
 				std::cerr << "ERROR: setSeq: non regular character found!" <<std::endl;

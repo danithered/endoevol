@@ -9,6 +9,7 @@ double par_deletion = 0;
 //double par_decay_rate = 1;
 double par_diffusion_rate = 1;
 double par_dissotiation = 0.25;
+double par_backmut = 0.0;
 
 int par_maxtime = 100000;
 int par_ncol = 512;
@@ -42,6 +43,7 @@ int paramsToFile(char* filename){
 	//paramfile << "par_decay_rate " << par_decay_rate << std::endl;
 	paramfile << "par_diffusion_rate " << par_diffusion_rate << std::endl;
 	paramfile << "par_dissotiation " << par_dissotiation << std::endl;
+	paramfile << "par_backmut " << par_backmut << std::endl;
 	paramfile << "par_maxtime " << par_maxtime << std::endl;
 	paramfile << "par_ncol " << par_ncol << std::endl;
 	paramfile << "par_nrow " << par_nrow << std::endl;
@@ -121,6 +123,15 @@ int Args(int argc, char **argv)
 				par_dissotiation = atof(argv[i]);
 				if(par_dissotiation < 0) {
 					std::cerr << "ERROR at reading argoments: option " << option << ": par_dissotiation cant be negative!" << std::endl;
+					return(-1);
+				}
+				continue;
+			
+			case 'B':
+				if (++i == argc) return 1;
+				par_backmut = atof(argv[i]);
+				if(par_backmut < 0 || par_backmut > 1) {
+					std::cerr << "ERROR at reading argoments: option " << option << ": par_backmut cant be negative!" << std::endl;
 					return(-1);
 				}
 				continue;
