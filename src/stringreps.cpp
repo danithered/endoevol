@@ -265,6 +265,8 @@ int strrep::Strrep::Replication(Strrep* child) {
 	}
 //	std::cout << "insertion/deletion ended" << std::endl;	
 	
+	if(return_value) original->align();
+	
 	//test if it is 0 length
 	if(copy->length == 0) {
 		copy->seq[0] = N;
@@ -274,7 +276,6 @@ int strrep::Strrep::Replication(Strrep* child) {
 	}
 	
 	no_repl++;
-	if(return_value) original->align();
 	
 //	std::cout << "replication happened" << std::endl;		
 	if(par_substitution) {
@@ -473,7 +474,7 @@ int strrep::Sca::Output(std::string filename, int time){
 	}
 	
 	for(int i = 0; i < size; i++ ){
-		if(matrix[i].role) output << "t_" << time << "\t" << i << "\t" << matrix[i].getRole() << "\t" << matrix[i].getSeq() << "\t" << matrix[i].krepl << "\t" << matrix[i].kendo << "\t" << matrix[i].kasso_repl << "\t" << matrix[i].kasso_endo << std::endl;
+		if(matrix[i].role) output << "t_" << time << "\t" << i << "\t"  << matrix[i].length << "\t" << matrix[i].getRole() << "\t" << matrix[i].getSeq() << "\t" << matrix[i].krepl << "\t" << matrix[i].kendo << "\t" << matrix[i].kasso_repl << "\t" << matrix[i].kasso_endo  << std::endl;
 	}
 
 	output.flush();

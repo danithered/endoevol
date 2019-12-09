@@ -94,13 +94,16 @@ namespace strrep {
 					target->seq[b] = seq[b];
 				}
 				
-				for(b=0; b<5; b++){
+				for(b=1; b<6; b++){
 					target->numbers[b] = numbers[b];
 				}
 			
 				target->complex = complex; 			// who is in complex with this replicator
+				
 				target->role = role;
+				
 				target->krepl = krepl;
+				target->kendo = kendo;
 				target->kasso_repl = kasso_repl;
 				target->kasso_endo = kasso_endo;
 			}

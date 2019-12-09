@@ -28,3 +28,44 @@ image(X, Y, W
       , col = hcl.colors(25, "YlOrRd", rev = TRUE)
       )
 contour(X, Y, W, add = TRUE, drawlabels = T)
+
+
+L=1:50
+R=1:50
+z = expand.grid(l=L, r=R)
+
+u=  z$r/z$l *(1-exp(-0.01 * z$l^4))
+u=  z$r/z$l *(1- exp(0.001*-z$l^2) )
+
+alfa <- 2
+beta <- 0.1
+c <- 4
+u=  (alfa^z$r) / (alfa^z$r + alfa^(z$l-z$r) ) *(1- exp(-beta * z$l^c) )
+
+u=  (z$r^alfa) / (z$r^alfa + (z$l-z$r)^alfa ) *(1- exp(-beta * z$l)^c )
+
+u=  1- 1/ (1+ z$r^(0.05*z$l) )
+u=  z$r/z$l *(1 - 1/ exp(0.01 * z$l) )
+
+
+u[z$r>z$l] <- 0
+     
+Z = matrix(
+  #( z$r/z$l *(1-exp(-0.1 * z$l^2))  )  
+  u
+  , ncol=length(L)
+)
+
+image(L, R, Z
+      , xlab="length"
+      , ylab="R"
+      #, main="x is replicated by y"
+      , sub=paste("alpha", alfa, ", beta", beta, ", c", c)
+      , col = hcl.colors(25, "YlOrRd", rev = TRUE)
+      , asp=1
+)
+#abline(a=-20, b=1)
+#abline(h=10)
+contour(L, R, Z, add = TRUE, drawlabels = T)
+
+points(c(40, 20, 10), c(20, 10, 5), cex=2)
