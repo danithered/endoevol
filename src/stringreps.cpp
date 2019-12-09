@@ -62,12 +62,12 @@ int strrep::Strrep::align() {
 	role = single;
 	
 	//rates
-	powsum = pow(par_alpha, R()) + pow(par_alpha, T()) + pow(par_alpha, E()) + pow(par_alpha, C()) + pow(par_alpha, B());
+	powsum = pow(R(), par_alpha) + pow(T(), par_alpha) + pow(E(), par_alpha) + pow(C(), par_alpha) + pow(B(), par_alpha);
 	
-	krepl = pow(par_alpha, R()) / powsum * length_activity[length];
-	kendo = pow(par_alpha, E()) / powsum * length_activity[length];
-	kasso_repl = pow(par_alpha, T()) / powsum * length_activity[length];
-	kasso_endo = pow(par_alpha, C()) / powsum * length_activity[length];
+	krepl = pow(R(), par_alpha) / powsum * length_activity[length];
+	kendo = pow(E(), par_alpha) / powsum * length_activity[length];
+	kasso_repl = pow(T(), par_alpha) / powsum * length_activity[length];
+	kasso_endo = pow(C(), par_alpha) / powsum * length_activity[length];
 //	std::cout << "align ended. role: " << role << ", length: " << length << ", krepl: " << krepl << ", kendo: " << kendo << ", kasso_repl: " << kasso_repl << ", kasso_endo: " << kasso_endo << std::endl << getSeq() << std::endl;	
 	return 0;
 }

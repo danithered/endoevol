@@ -1,6 +1,6 @@
 #include "parameters.h" 
 
-double par_length_dependence = -0.05;
+double par_length_dependence = -0.1;
 double par_death = 0.1;
 double par_substitution = 0;
 double par_insertion = 0;
@@ -10,8 +10,8 @@ double par_deletion = 0;
 double par_diffusion_rate = 1;
 double par_dissotiation = 0.25;
 double par_backmut = 0.0;
-double par_exponent = 4;
-double par_alpha = 1.2;
+double par_exponent = 1;
+double par_alpha = 5;
 
 int par_maxtime = 100000;
 int par_ncol = 512;
