@@ -42,6 +42,7 @@ strrep::Strrep::~Strrep() {
 
 int strrep::Strrep::align() {
 //	std::cout << "align() called" << std::endl;
+	double powsum;
 	
 	numbers[1] = numbers[2] = numbers[3] = numbers[4] = numbers[5] = 0;
 	if(length==0) {
@@ -54,17 +55,19 @@ int strrep::Strrep::align() {
 	}
 	
 	if( R() + E() + C() + T() + B() != length ) {
-		std::cerr << "Something went wrong during alignment!" << std::endl << R() << "+" << E() << "+" << C() << "+" << T() << " != " << length << " of seq" << std::endl << getSeq() << std::endl;
+		std::cerr << "Something went wrong during alignment!" << std::endl << R() << "+" << E() << "+" << C() << "+" << T() << "+" << B() << " != " << length << " of seq" << std::endl << getSeq() << std::endl;
 		return(1);
 	}
 	
 	role = single;
 	
 	//rates
-	krepl = R() * length_activity[length];
-	kendo = E() * length_activity[length];
-	kasso_repl = T() * length_activity[length];
-	kasso_endo = C() * length_activity[length];
+	powsum = pow(par_alpha, R()) + pow(par_alpha, T()) + pow(par_alpha, E()) + pow(par_alpha, C()) + pow(par_alpha, B());
+	
+	krepl = pow(par_alpha, R()) / powsum * length_activity[length];
+	kendo = pow(par_alpha, E()) / powsum * length_activity[length];
+	kasso_repl = pow(par_alpha, T()) / powsum * length_activity[length];
+	kasso_endo = pow(par_alpha, C()) / powsum * length_activity[length];
 //	std::cout << "align ended. role: " << role << ", length: " << length << ", krepl: " << krepl << ", kendo: " << kendo << ", kasso_repl: " << kasso_repl << ", kasso_endo: " << kasso_endo << std::endl << getSeq() << std::endl;	
 	return 0;
 }
@@ -91,7 +94,7 @@ void strrep::Strrep::del() {
 
 void strrep::Strrep::set_length_activity(double beta) {
 	for (int l = 0; l < MAXLEN; l++) {
-		length_activity[l] = (1 - exp(beta * (double) l)) / (double) l;
+		length_activity[l] = 1 - exp(beta * pow((double) l, par_exponent) )  ;
 	}
 }
 

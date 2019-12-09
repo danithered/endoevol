@@ -10,6 +10,8 @@ double par_deletion = 0;
 double par_diffusion_rate = 1;
 double par_dissotiation = 0.25;
 double par_backmut = 0.0;
+double par_exponent = 4;
+double par_alpha = 1.2;
 
 int par_maxtime = 100000;
 int par_ncol = 512;
@@ -44,6 +46,8 @@ int paramsToFile(char* filename){
 	paramfile << "par_diffusion_rate " << par_diffusion_rate << std::endl;
 	paramfile << "par_dissotiation " << par_dissotiation << std::endl;
 	paramfile << "par_backmut " << par_backmut << std::endl;
+	paramfile << "par_exponent " << par_exponent << std::endl;
+	paramfile << "par_alpha " << par_alpha << std::endl;
 	paramfile << "par_maxtime " << par_maxtime << std::endl;
 	paramfile << "par_ncol " << par_ncol << std::endl;
 	paramfile << "par_nrow " << par_nrow << std::endl;
@@ -163,6 +167,15 @@ int Args(int argc, char **argv)
 				}
 				continue;
 			
+			case 'a':
+				if (++i == argc) return 1;
+				par_alpha = atof(argv[i]);
+				if(par_alpha < 0) {
+					std::cerr << "ERROR at reading argoments: option " << option << ": cant be negative!" << std::endl;
+					return(-1);
+				}
+				continue;
+			
 			case 'T':
 				if (++i == argc) return 1;
 				par_maxtime = atoi(argv[i]);
@@ -175,6 +188,11 @@ int Args(int argc, char **argv)
 					std::cerr << "ERROR at reading argoments: option " << option << ": par_ncol cant be negative!" << std::endl;
 					return(-1);
 				}
+				continue;
+			
+			case 'C':
+				if (++i == argc) return 1;
+				par_exponent = atof(argv[i]);
 				continue;
 			
 			case 'r':
