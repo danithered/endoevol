@@ -1,4 +1,4 @@
-datadir <- "/home/danielred/Programs/endoevol/OUT/TR_sub_2/"
+datadir <- "/home/danielred/Programs/endoevol/OUT/TRBEC3_1/"
 
 library(ggplot2)
 getPar <- function(parfile, parname){
@@ -6,19 +6,31 @@ getPar <- function(parfile, parname){
 }
 setwd(datadir)
 #death = getPar("parameters.txt", "par_death")
-data <- read.table("output.txt", header=F, sep="\t", col.names= c("ttime", "cell", "role", "seq", "krepl", "kendo", "kT", "kC"), colClasses = c("character", NA, "factor", "character", NA, NA, NA, NA))
+data <- read.table("output_tail.txt", header=F, sep="\t", col.names= c("ttime", "cell", "length", "role", "seq", "krepl", "kendo", "kT", "kC"), colClasses = c("character", NA, NA, "factor", "character", NA, NA, NA, NA))
 data$ttime <- as.numeric(substring(data$ttime, 3))
-data <- cbind(data, length=nchar(data$seq))
+#data <- cbind(data, length=nchar(data$seq))
 str(data)
 atlagadat <- data.frame(
-  time=rep(unique(data$ttime), 4),
-  activity=c( sapply(unique(data$ttime), function(x, data) mean(data[data$ttime == x, "krepl"]), data ),
-              sapply(unique(data$ttime), function(x, data) mean(data[data$ttime == x, "kendo"]), data ),
-              sapply(unique(data$ttime), function(x, data) mean(data[data$ttime == x, "kT"]), data ),
-              sapply(unique(data$ttime), function(x, data) mean(data[data$ttime == x, "kC"]), data )
-          ),
-  type=rep(c("krepl", "kendo", "kT", "kC"), each=length(unique(data$ttime)) )
-  )
+time=rep(unique(data$ttime), 4),
+number=c( sapply(unique(data$ttime), function(x, data) length(data[data$ttime == x, "krepl"]), data ),
+         sapply(unique(data$ttime), function(x, data) length(data[data$ttime == x, "kendo"]), data ),
+         sapply(unique(data$ttime), function(x, data) length(data[data$ttime == x, "kT"]), data ),
+         sapply(unique(data$ttime), function(x, data) length(data[data$ttime == x, "kC"]), data )
+),
+activity=c( sapply(unique(data$ttime), function(x, data) mean(data[data$ttime == x, "krepl"]), data ),
+            sapply(unique(data$ttime), function(x, data) mean(data[data$ttime == x, "kendo"]), data ),
+            sapply(unique(data$ttime), function(x, data) mean(data[data$ttime == x, "kT"]), data ),
+            sapply(unique(data$ttime), function(x, data) mean(data[data$ttime == x, "kC"]), data )
+        ),
+sd=c( sapply(unique(data$ttime), function(x, data) sd(data[data$ttime == x, "krepl"]), data ),
+            sapply(unique(data$ttime), function(x, data) sd(data[data$ttime == x, "kendo"]), data ),
+            sapply(unique(data$ttime), function(x, data) sd(data[data$ttime == x, "kT"]), data ),
+            sapply(unique(data$ttime), function(x, data) sd(data[data$ttime == x, "kC"]), data )
+        ),
+type=rep(c("krepl", "kendo", "kT", "kC"), each=length(unique(data$ttime)) )
+)
+atlagadat <- cbind(atlagadat, se=atlagadat$sd/sqrt(atlagadat$number))
+
 roletime <- data.frame(
   time= rep(unique(data$ttime), 5),
   number= c(
@@ -38,6 +50,7 @@ roletime <- data.frame(
 table(data$role)
 ggplot(atlagadat, aes(x=time, y=activity, colour=type))+
   geom_line()+
+  geom_errorbar(aes(ymin=activity-se, ymax=activity+se))
   labs(caption=paste("par_death", getPar("parameters.txt", "par_death"), "diff", getPar("parameters.txt", "par_diffusion_rate"), "par_substitution", getPar("parameters.txt", "par_substitution") ) )
 
 ggplot(roletime, aes(x=time, y=number, fill=type))+
@@ -59,3 +72,5 @@ hist(data[data$ttime==max(data$ttime),"kC"])
 hist(data[data$ttime==max(data$ttime),"kT"])
 hist(data[data$ttime==max(data$ttime),"krepl"])
 hist(data[data$ttime==max(data$ttime),"length"])
+
+    

@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
 	//variables
 	double diff = 0.0, decay = 0.0;
 	int what, where, gen=0;
-	char command[512], output_file_name[255], pic_folder[255];
+	char command[512], output_file_path[255], pic_folder[255];
 	
 	//init staff
 	strrep::Strrep::set_length_activity(par_length_dependence);
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 	sprintf(command, "mkdir -p OUT/%s/%s\0", par_ID, par_pic_folder);
 	system(command);
 	
-	sprintf(output_file_name, "OUT/%s/output.txt\0", par_ID);
+	sprintf(output_file_path, "OUT/%s/\0", par_ID);
 	sprintf(pic_folder, "OUT/%s/%s\0", par_ID, par_pic_folder);
 	
 	//print parameters
@@ -72,8 +72,21 @@ int main(int argc, char *argv[]) {
 //		}
 //		cout << "counts: empty: " << empty_count << " single: " << single_count << " repl: " << r_count << " endo: " << e_count << " repl_template: " << rt_count << " endo_template: " << et_count << endl;
 
-		if(gen % par_output_interval == 0) aut.Output(output_file_name, gen);
+		if(gen % par_output_interval == 0) aut.Output(output_file_path, gen);
 		if(gen % par_movie_interval == 0) aut.Picture(pic_folder, gen);
+		
+/*		
+		char rrtcee[]="RRRTRRRTRRRRRRRTCTCTCTCTCTCTTTCTCTCTCTTEEEEEEEEEEE\0";
+		char eee[]="EEEEEEEEEEE\0";
+		if(gen==7000) {
+			for(int xx=0; xx<50; xx++ ){
+				for(int yy=0; yy <50; yy++){
+					if(gsl_rng_uniform(r) < 0.8) aut.get(xx + par_ncol*yy)->setSeq(rrtcee);
+					else aut.get(xx + par_ncol*yy)->setSeq(eee);
+				}
+			}
+		}
+*/		
 
 		//Update
 		for(int iter=0; iter < aut.size; iter++){
@@ -106,7 +119,7 @@ int main(int argc, char *argv[]) {
 		
 	}
 	
-	if(par_output_interval) aut.Output(output_file_name, gen);
+	if(par_output_interval) aut.Output(output_file_path, gen);
 	if(par_movie_interval) aut.Picture(pic_folder, gen);
 
 

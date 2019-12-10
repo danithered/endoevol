@@ -37,15 +37,15 @@ z = expand.grid(l=L, r=R)
 u=  z$r/z$l *(1-exp(-0.01 * z$l^4))
 u=  z$r/z$l *(1- exp(0.001*-z$l^2) )
 
-alfa <- 2
+alfa <- 5
 beta <- 0.1
-c <- 4
-u=  (alfa^z$r) / (alfa^z$r + alfa^(z$l-z$r) ) *(1- exp(-beta * z$l^c) )
+c <- 1
+#u=  (alfa^z$r) / (alfa^z$r + alfa^(z$l-z$r) ) *(1- exp(-beta * z$l^c) )
 
 u=  (z$r^alfa) / (z$r^alfa + (z$l-z$r)^alfa ) *(1- exp(-beta * z$l)^c )
 
-u=  1- 1/ (1+ z$r^(0.05*z$l) )
-u=  z$r/z$l *(1 - 1/ exp(0.01 * z$l) )
+#u=  1- 1/ (1+ z$r^(0.05*z$l) )
+#u=  z$r/z$l *(1 - 1/ exp(0.01 * z$l) )
 
 
 u[z$r>z$l] <- 0

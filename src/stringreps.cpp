@@ -466,21 +466,49 @@ void strrep::Strrep::setSeq(char* charseq){
 	align();
 }
 
-int strrep::Sca::Output(std::string filename, int time){
+int strrep::Sca::Output(std::string filepath, int time){
 	// open a file in write mode.
 	static int output_open=0;
-	static std::fstream output;
+	static std::fstream output, mean_output;
+	static char filename[255] = "\0", mean_filename[255] = "\0", rolechars[]="NSRETC"; 
+	
+	int numbers[6]={0,0,0,0,0,0}, i=0;
+	double length[6]={0.0,0.0,0.0,0.0,0.0,0.0}, kR[6]={0.0,0.0,0.0,0.0,0.0,0.0}, kE[6]={0.0,0.0,0.0,0.0,0.0,0.0}, kT[6]={0.0,0.0,0.0,0.0,0.0,0.0}, kC[6]={0.0,0.0,0.0,0.0,0.0,0.0};
+	
 	if(!output_open) {
-//		std::cout << "Output opened" << std::endl;		
+//		std::cout << "Output opened" << std::endl;
+		sprintf(filename, "%soutput.txt\0", filepath);		
+		sprintf(mean_filename, "%satlagadat.txt\0", filepath);		
 		output_open++;
-		output.open(filename, std::fstream::out | std::fstream::app);
+		mean_output.open(mean_filename, std::fstream::out | std::fstream::app);
+		mean_output << "time\tnumber\trole\tlength\tkR\tkE\tkT\tkC" << std::endl;
+		//mean_output.open(filename, std::fstream::out | std::fstream::app);
 	}
 	
-	for(int i = 0; i < size; i++ ){
-		if(matrix[i].role) output << "t_" << time << "\t" << i << "\t"  << matrix[i].length << "\t" << matrix[i].getRole() << "\t" << matrix[i].getSeq() << "\t" << matrix[i].krepl << "\t" << matrix[i].kendo << "\t" << matrix[i].kasso_repl << "\t" << matrix[i].kasso_endo  << std::endl;
+	for(i = 0; i < size; i++ ){
+		if(matrix[i].role) {
+			output << "t_" << time << "\t" << i << "\t"  << matrix[i].length << "\t" << matrix[i].getRole() << "\t" << matrix[i].getSeq() << "\t" << matrix[i].krepl << "\t" << matrix[i].kendo << "\t" << matrix[i].kasso_repl << "\t" << matrix[i].kasso_endo  << std::endl;
+			numbers[(int)matrix[i].role]++;
+			length[(int)matrix[i].role] += matrix[i].length;
+			kR[(int)matrix[i].role] += matrix[i].krepl;
+			kE[(int)matrix[i].role] += matrix[i].kendo;
+			kT[(int)matrix[i].role] += matrix[i].kasso_repl;
+			kC[(int)matrix[i].role] += matrix[i].kasso_endo;
+		}
+	}
+	
+	for(i=1; i<6; i++){
+		length[i] = length[i]/numbers[i];
+		kR[i] = kR[i]/numbers[i];
+		kE[i] = kE[i]/numbers[i];
+		kT[i] = kT[i]/numbers[i];
+		kC[i] = kC[i]/numbers[i];
+		
+		mean_output << time << "\t" << numbers[i] << "\t" << rolechars[i] << "\t" << length[i] << "\t" << kR[i] << "\t" << kE[i] << "\t" << kT[i] << "\t" << kC[i] << std::endl;
 	}
 
 	output.flush();
+	mean_output.flush();
 	return(0);
 }
 
