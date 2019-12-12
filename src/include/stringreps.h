@@ -204,7 +204,7 @@ namespace strrep {
 		public:
 			void Update(int cell);
 			
-			int Output(std::string filename, int time);
+			int Output(char* filename, int time);
 			
 			Sca(int size1=300, int size2=300, cadv::Ca_layout layout_type = cadv::Ca_layout::square){
 				nrow=size1;

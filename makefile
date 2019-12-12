@@ -20,10 +20,13 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 _OBJ_test = test.o 
 OBJ_test = $(patsubst %,$(ODIR)/%,$(_OBJ_test))
 
-$(ODIR)/%.o: $(SRCDIR)/%.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
 
+$(ODIR)/%.o: $(SRCDIR)/%.c $(DEPS)
+	mkdir -p $(ODIR)
+	$(CC) -c -o $@ $< $(CFLAGS)
+	
 $(ODIR)/%.o: $(SRCDIR)/%.cpp $(DEPS)
+	mkdir -p $(ODIR)
 	$(CPPC) -c -o $@ $< $(CFLAGS)
 
 $(PROGNAME): $(OBJ)

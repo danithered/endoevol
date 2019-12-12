@@ -466,7 +466,7 @@ void strrep::Strrep::setSeq(char* charseq){
 	align();
 }
 
-int strrep::Sca::Output(std::string filepath, int time){
+int strrep::Sca::Output(char* filepath, int time){
 	// open a file in write mode.
 	static int output_open=0;
 	static std::fstream output, mean_output;
@@ -475,13 +475,18 @@ int strrep::Sca::Output(std::string filepath, int time){
 	int numbers[6]={0,0,0,0,0,0}, i=0;
 	double length[6]={0.0,0.0,0.0,0.0,0.0,0.0}, kR[6]={0.0,0.0,0.0,0.0,0.0,0.0}, kE[6]={0.0,0.0,0.0,0.0,0.0,0.0}, kT[6]={0.0,0.0,0.0,0.0,0.0,0.0}, kC[6]={0.0,0.0,0.0,0.0,0.0,0.0};
 	
+//	std::cout << filepath << std::endl;	
+	
 	if(!output_open) {
-//		std::cout << "Output opened" << std::endl;
 		sprintf(filename, "%soutput.txt\0", filepath);		
 		sprintf(mean_filename, "%satlagadat.txt\0", filepath);		
-		output_open++;
+		
+		output.open(filename, std::fstream::out | std::fstream::app);
 		mean_output.open(mean_filename, std::fstream::out | std::fstream::app);
+		
+		output_open++;
 		mean_output << "time\tnumber\trole\tlength\tkR\tkE\tkT\tkC" << std::endl;
+/**/		std::cout << "Output opened: " << filename << std::endl;
 		//mean_output.open(filename, std::fstream::out | std::fstream::app);
 	}
 	
@@ -498,11 +503,11 @@ int strrep::Sca::Output(std::string filepath, int time){
 	}
 	
 	for(i=1; i<6; i++){
-		length[i] = length[i]/numbers[i];
-		kR[i] = kR[i]/numbers[i];
-		kE[i] = kE[i]/numbers[i];
-		kT[i] = kT[i]/numbers[i];
-		kC[i] = kC[i]/numbers[i];
+		length[i] = numbers[i]?length[i]/numbers[i]:0;
+		kR[i] = numbers[i]?kR[i]/numbers[i]:0;
+		kE[i] = numbers[i]?kE[i]/numbers[i]:0;
+		kT[i] = numbers[i]?kT[i]/numbers[i]:0;
+		kC[i] = numbers[i]?kC[i]/numbers[i]:0;
 		
 		mean_output << time << "\t" << numbers[i] << "\t" << rolechars[i] << "\t" << length[i] << "\t" << kR[i] << "\t" << kE[i] << "\t" << kT[i] << "\t" << kC[i] << std::endl;
 	}

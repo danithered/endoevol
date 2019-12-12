@@ -50,7 +50,7 @@ roletime <- data.frame(
 table(data$role)
 ggplot(atlagadat, aes(x=time, y=activity, colour=type))+
   geom_line()+
-  geom_errorbar(aes(ymin=activity-se, ymax=activity+se))
+  geom_errorbar(aes(ymin=activity-se, ymax=activity+se))+
   labs(caption=paste("par_death", getPar("parameters.txt", "par_death"), "diff", getPar("parameters.txt", "par_diffusion_rate"), "par_substitution", getPar("parameters.txt", "par_substitution") ) )
 
 ggplot(roletime, aes(x=time, y=number, fill=type))+

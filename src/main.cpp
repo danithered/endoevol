@@ -46,6 +46,7 @@ int main(int argc, char *argv[]) {
 	
 	sprintf(output_file_path, "OUT/%s/\0", par_ID);
 	sprintf(pic_folder, "OUT/%s/%s\0", par_ID, par_pic_folder);
+//	cout << output_file_path << endl;	
 	
 	//print parameters
 	sprintf(command, "OUT/%s/parameters.txt\0", par_ID);
@@ -75,18 +76,18 @@ int main(int argc, char *argv[]) {
 		if(gen % par_output_interval == 0) aut.Output(output_file_path, gen);
 		if(gen % par_movie_interval == 0) aut.Picture(pic_folder, gen);
 		
-/*		
+/*/		
 		char rrtcee[]="RRRTRRRTRRRRRRRTCTCTCTCTCTCTTTCTCTCTCTTEEEEEEEEEEE\0";
 		char eee[]="EEEEEEEEEEE\0";
-		if(gen==7000) {
-			for(int xx=0; xx<50; xx++ ){
-				for(int yy=0; yy <50; yy++){
+		if(gen==1) {
+			for(int xx=par_nrow/2-25; xx < par_nrow/2+26; xx++ ){
+				for(int yy= par_ncol/2-25 ; yy < par_ncol/2+26; yy++){
 					if(gsl_rng_uniform(r) < 0.8) aut.get(xx + par_ncol*yy)->setSeq(rrtcee);
 					else aut.get(xx + par_ncol*yy)->setSeq(eee);
 				}
 			}
 		}
-*/		
+/*/		
 
 		//Update
 		for(int iter=0; iter < aut.size; iter++){
