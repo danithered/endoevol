@@ -23,6 +23,7 @@ strrep::Strrep::Strrep() {
 		//gen random sequence
 		for(int b = 0; b < length; b++) {
 			seq[b] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 4) + 1);
+			seq_compl[b] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 4) + 1);
 		}
 		
 		if ( align() ) {
@@ -40,11 +41,15 @@ strrep::Strrep::~Strrep() {
 	
 }
 
+void strrep::Strrep::setNumsZero() {
+	numbers_compl[1] = numbers_compl[2] = numbers_compl[3] = numbers_compl[4] = numbers_compl[5] = numbers[1] = numbers[2] = numbers[3] = numbers[4] = numbers[5] = 0;
+}
+
 int strrep::Strrep::align() {
 //	std::cout << "align() called" << std::endl;
 	double powsum;
 	
-	numbers[1] = numbers[2] = numbers[3] = numbers[4] = numbers[5] = 0;
+	setNumsZero();
 	if(length==0) {
 		role=empty;
 		return 0;
@@ -52,10 +57,11 @@ int strrep::Strrep::align() {
 	
 	for(int b = 0; b < length; b++) {
 		numbers[seq[b]]++;
+		numbers_compl[seq_compl[b]]++;
 	}
 	
-	if( R() + E() + C() + T() + B() != length ) {
-		std::cerr << "Something went wrong during alignment!" << std::endl << R() << "+" << E() << "+" << C() << "+" << T() << "+" << B() << " != " << length << " of seq" << std::endl << getSeq() << std::endl;
+	if( R() + E() + C() + T() + B() + Rc() + Ec() + Cc() + Tc() + Bc() != 2 * length ) {
+		std::cerr << "Something went wrong during alignment!" << std::endl << R() << "+" << E() << "+" << C() << "+" << T() << "+" << B() << "+" << Rc() << "+" << Ec() << "+" << Cc() << "+" << Cc() << "+" << Tc() << "+" << Bc() << " != 2x " << length << " of seq" << std::endl << getSeq() << std::endl;
 		return(1);
 	}
 	
@@ -74,11 +80,12 @@ int strrep::Strrep::align() {
 
 void strrep::Strrep::del() {
 	if(role != empty) no_repl--;
-	numbers[1] = numbers[2] = numbers[3] = numbers[4] = numbers[5] = 0;
+	setNumsZero();
 	//for(int b = 0; b < MAXLEN; b++) {
 	//	seq[b] = 0;
 	//}
 	seq[0] = N;
+	seq_compl[0] = N;
 	length = 0;
 	role = empty;
 	krepl = kendo = kasso_repl = kasso_endo = 0;
@@ -153,7 +160,8 @@ void strrep::Strrep::Clevage(Strrep* child) {
 //					printf("clevage: part1->stays, part2->child\n");
 		for(i = cut; i < length; i++) {
 			child->seq[i-cut] = seq[i];
-			seq[i] = N;
+			child->seq_compl[i-cut] = seq_compl[i];
+			seq[i] = seq_compl[i] = N;
 		}
 		child->length = length - cut;
 		length=cut;
@@ -162,11 +170,13 @@ void strrep::Strrep::Clevage(Strrep* child) {
 //					printf("clevage: part1->child, part2->stays(parent)\n");
 		for(i = 0; i < cut; i++) {
 			child->seq[i] = seq[i];
+			child->seq_compl[i] = seq_compl[i];
 			//seq[i] = seq[i + cut];
 		}
 		for(; i < length; i++) {
 			seq[i-cut] = seq[i];
-			seq[i] = N;
+			seq_compl[i-cut] = seq_compl[i];
+			seq_compl[i] = seq[i] = N;
 		}
 		child->length = cut;
 		length = length - cut;
@@ -434,9 +444,23 @@ std::string strrep::Strrep::getSeq(){
 	return(charseq);
 }
 
-void strrep::Strrep::setSeq(char* charseq){
+std::string strrep::Strrep::getComplSeq(){
+	std::string charseq;
+	static char basechars[] = "NRETCB";
+	
+	if(role == empty) return( (std::string) "N" );
+	
+	charseq = basechars[(int)seq_compl[0]];
+	for(int b = 1; b < length; b++) {
+		charseq = charseq + basechars[(int)seq_compl[b]];
+	}
+	
+	return(charseq);
+}
+
+void strrep::Strrep::setSeq(char* charseq, char* charseq_compl){
 	del();
-	for(length = 0; charseq[length] != '\0'; length++){
+	for(length = 0; charseq[length] != '\0' && charseq_compl[length] != '\0'; length++){
 		if(length > MAXLEN){
 			std::cerr << "too long initial sequence! Truncated" << std::endl;
 			break;
@@ -459,6 +483,26 @@ void strrep::Strrep::setSeq(char* charseq){
 				break;
 			default:
 				std::cerr << "ERROR: setSeq: non regular character found!" <<std::endl;
+				return;
+		}
+		switch(charseq_compl[length]){
+			case 'R':
+				seq_compl[length]=strrep::R;
+				break;
+			case 'E':
+				seq_compl[length]=strrep::E;
+				break;
+			case 'T':
+				seq_compl[length]=strrep::T;
+				break;
+			case 'C':
+				seq_compl[length]=strrep::C;
+				break;
+			case 'B':
+				seq_compl[length]=strrep::B;
+				break;
+			default:
+				std::cerr << "ERROR: setSeq: non regular complementer character found!" <<std::endl;
 				return;
 		}
 	}
@@ -492,7 +536,7 @@ int strrep::Sca::Output(char* filepath, int time){
 	
 	for(i = 0; i < size; i++ ){
 		if(matrix[i].role) {
-			output << "t_" << time << "\t" << i << "\t"  << matrix[i].length << "\t" << matrix[i].getRole() << "\t" << matrix[i].getSeq() << "\t" << matrix[i].krepl << "\t" << matrix[i].kendo << "\t" << matrix[i].kasso_repl << "\t" << matrix[i].kasso_endo  << std::endl;
+			output << "t_" << time << "\t" << i << "\t"  << matrix[i].length << "\t" << matrix[i].getRole() << "\t" << matrix[i].getSeq() << "\t" << matrix[i].krepl << "\t" << matrix[i].kendo << "\t" << matrix[i].kasso_repl << "\t" << matrix[i].kasso_endo << '\t' << matrix[i].getComplSeq() << std::endl;
 			numbers[(int)matrix[i].role]++;
 			length[(int)matrix[i].role] += matrix[i].length;
 			kR[(int)matrix[i].role] += matrix[i].krepl;

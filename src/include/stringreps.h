@@ -25,9 +25,9 @@ namespace strrep {
 			static double length_activity[MAXLEN]; // (1 - exp(beta * length)) / length for length 1 to MAXLEN
 			
 			//for individual cells
-			bases* seq;
+			bases *seq, *seq_compl;
 			
-			int numbers[6];		// the number of different bases in the sequence. N:0, R:1, E:2, T:3, C:4, B:5
+			int numbers[6], numbers_compl[6];		// the number of different bases in the sequence. N:0, R:1, E:2, T:3, C:4, B:5
 			//int R;
 			//int E;
 			//int T;
@@ -70,28 +70,41 @@ namespace strrep {
 			inline int C() {return(numbers[4]);};
 			inline int B() {return(numbers[5]);};
 			
+			inline int Rc() {return(numbers_compl[1]);};
+			inline int Ec() {return(numbers_compl[2]);};
+			inline int Tc() {return(numbers_compl[3]);};
+			inline int Cc() {return(numbers_compl[4]);};
+			inline int Bc() {return(numbers_compl[5]);};
+			
 			//dissociation
 			void diss();
 			
 			//test for dissotioation
 			void dissotiation(double rand);
 			
+			//set numbers and numbers_compl to zero
+			void setNumsZero();
+			
 			//get sequence as string
 			std::string getSeq();
+			std::string getComplSeq();
 			
 			//get role as string
 			std::string getRole();
 			
 			//set sequence from character string
-			void setSeq(char *charseq);
+			void setSeq(char *charseq, char *charseq_compl);
 			
 			//copy to
 			void copyTo(Strrep *target) {
 				int b=0;
 				
+				
+				//why dont just swap pointers??
 				target->length=length;
 				for(b = 0; b < length; b++) {
 					target->seq[b] = seq[b];
+					target->seq_compl[b] = seq_compl[b];
 				}
 				
 				for(b=1; b<6; b++){

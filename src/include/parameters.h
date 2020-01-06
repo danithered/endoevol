@@ -31,6 +31,7 @@ extern char par_ID[255];
 
 
 extern char **par_init_seqs;
+extern char **par_init_seqs_compl;
 extern double *par_init_props;
 extern int par_init_no;
 

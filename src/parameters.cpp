@@ -23,6 +23,7 @@ char par_pic_folder[255] = "movie\0";
 char par_ID[255] = "test\0";
 
 char **par_init_seqs;
+char **par_init_seqs_compl;
 double *par_init_props;
 int par_init_no=0;
 
@@ -59,6 +60,9 @@ int paramsToFile(char* filename){
 	paramfile << "par_init_no " << par_init_no << std::endl;
 	paramfile << "par_init_seqs ";
 	for(i=0; i < par_init_no; i++) paramfile << par_init_seqs[i] << " ";
+	paramfile << std::endl;
+	paramfile << "par_init_seqs_compl ";
+	for(i=0; i < par_init_no; i++) paramfile << par_init_seqs_compl[i] << " ";
 	paramfile << std::endl;
 	paramfile << "par_init_props ";
 	for(i=0; i < par_init_no; i++) paramfile << par_init_props[i] << " ";
@@ -245,20 +249,29 @@ int Args(int argc, char **argv)
 			case 'S':
 				if (++i == argc) return 1;
 				par_init_no = atoi(argv[i]);
-				if(par_init_no > 0 && i + 2*par_init_no < argc) {
+				if(par_init_no > 0 && i + 3*par_init_no < argc) {
 					par_init_props = new double [par_init_no];
 					par_init_seqs = new char* [par_init_no];
+					par_init_seqs_compl = new char* [par_init_no];
 					for(s = 0; s < par_init_no; s++){
 						par_init_props[s] = atof(argv[++i]);
 						if(par_init_props[s] < 0.0) {
 							std::cerr << "ERROR at reading argoments: trouble with proportions of initial sequences: it has to be non negative!" << std::endl;
 							return -2;
 						}
-						par_init_seqs[s] = new char [MAXLEN+1];
-						if(strlen(argv[++i]) > MAXLEN) {
+						//storing sequences
+						par_init_seqs[s] = new char [strlen(argv[++i])+1];
+						if(strlen(argv[i]) > MAXLEN) {
 							std::cerr << "ERROR at reading argoments: trouble initial sequences: has to be shorter than " << MAXLEN << std::endl;
 						}
 						strcpy(par_init_seqs[s], argv[i]);
+						
+						par_init_seqs_compl[s] = new char [strlen(argv[++i])+1];
+						if(strlen(argv[i]) > MAXLEN) {
+							std::cerr << "ERROR at reading argoments: trouble initial compl sequences: has to be shorter than " << MAXLEN << std::endl;
+						}
+						strcpy(par_init_seqs_compl[s], argv[i]);
+						
 					}
 				}
 				else {
