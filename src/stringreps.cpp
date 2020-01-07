@@ -244,7 +244,8 @@ int strrep::Strrep::Replication(Strrep* child) {
 		if(gsl_rng_uniform(r) < par_deletion) {
 			if(gsl_rng_uniform(r) < par_insertion) { //deletion and insertion
 				if(pos_copy >= MAXLEN) {std::cerr << "ERROR (nonPerfectReplication): reached max length!" << std::endl; break;} //check if copy is too long
-				copy->seq[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 5) + 1);
+				copy->seq[pos_copy] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 5) + 1);
+				copy->seq_compl[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 5) + 1);
 //				std::cout << "insertion of char " << copy->seq[pos_copy -1] << std::endl;
 			}
 			else {
@@ -255,22 +256,27 @@ int strrep::Strrep::Replication(Strrep* child) {
 			if( gsl_rng_uniform(r) < par_insertion) { //length increases: only insertion...
 				if(pos_copy + 1 >= MAXLEN) {std::cerr << "ERROR (nonPerfectReplication): reached max length!!" << std::endl; break;} //check if copy is too long
 				if( gsl_rng_uniform(r) < 0.5) { // ...to the right
-					copy->seq[pos_copy++] = original->seq[pos_original];
+					copy->seq[pos_copy] = original->seq[pos_original];
+					copy->seq_compl[pos_copy++] = original->seq_compl[pos_original];
 //					if(copy[pos_copy-1] == '\0') printf("ERROR: nonPerfectReplication: RNAc2cc has found a non RNA charaster (%c) during inserting right (%d)!\n%d\t%s\n%d\t%s\n", original[pos_original], length, (int)strlen(original), original, (int)strlen(copy), copy);
-					copy->seq[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 5) + 1);
+					copy->seq[pos_copy] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 5) + 1);
+					copy->seq_compl[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 5) + 1);
 //					std::cout << "insertion of char " << copy->seq[pos_copy -1] << std::endl;
 					copy->length++;
 				}
 				else { // ...to the left
-					copy->seq[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 5) + 1);
+					copy->seq[pos_copy] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 5) + 1);
+					copy->seq_compl[pos_copy++] = static_cast<strrep::bases>(gsl_rng_uniform_int(r, 5) + 1);
 //					std::cout << "insertion of char " << copy->seq[pos_copy -1] << std::endl;
-					copy->seq[pos_copy++] = original->seq[pos_original];
+					copy->seq[pos_copy] = original->seq[pos_original];
+					copy->seq_compl[pos_copy++] = original->seq_compl[pos_original];
 //					if(copy[pos_copy-1] == '\0') printf("ERROR: nonPerfectReplication: RNAc2cc has found a non RNA charaster (%c) during inserting left (%d)!\n%d\t%s\n%d\t%s\n", original[pos_original], length, (int)strlen(original), original, (int)strlen(copy), copy);
 					copy->length++;
 				}
 			} else { //basic copying
 				if(pos_copy >= MAXLEN) {std::cerr << "ERROR (nonPerfectReplication): reached max length!!!" << std::endl; break;} //check if copy is too long
-				copy->seq[pos_copy++] = original->seq[pos_original];
+				copy->seq[pos_copy] = original->seq[pos_original];
+				copy->seq_compl[pos_copy++] = original->seq_compl[pos_original];
 //				if(copy[pos_copy-1] == '\0') printf("ERROR: nonPerfectReplication: RNAc2cc has found a non RNA charaster (%c) during basic copying (%d)!\n%d\t%s\n%d\t%s\n", original[pos_original], length, (int)strlen(original), original, (int)strlen(copy), copy);
 			}
 		}
@@ -283,6 +289,7 @@ int strrep::Strrep::Replication(Strrep* child) {
 	//test if it is 0 length
 	if(copy->length == 0) {
 		copy->seq[0] = N;
+		copy->seq_compl[0] = N;
 		copy->role = empty;
 		copy->length = 0;
 		return(return_value);
@@ -337,6 +344,7 @@ int strrep::Strrep::Replication(Strrep* child) {
 		sequence. */
 	
 	for(i=0;i<nmut;i++){
+		//mutate seq
 		original_base = (int) copy->seq[msite[i]];
 /*/		if(original_base == strrep::B){
 			if(gsl_rng_uniform(r) < par_backmut){
@@ -361,6 +369,18 @@ int strrep::Strrep::Replication(Strrep* child) {
 			copy->seq[msite[i]] = static_cast<strrep::bases>( original_base?original_base:5 );
 		}
 		
+		//mutate seq_compl
+		original_base = (int) copy->seq_compl[msite[i]];
+		if(original_base == strrep::B) {
+			if(gsl_rng_uniform(r) < par_backmut) {
+				copy->seq_compl[msite[i]] = static_cast<strrep::bases>( gsl_rng_uniform_int(r, 4) + 1  );
+			}
+		}
+		else {
+			mint = gsl_rng_uniform_int(r, 4) + 1 ; 
+			original_base = (original_base + mint) % 5;
+			copy->seq_compl[msite[i]] = static_cast<strrep::bases>( original_base?original_base:5 );
+		}
 	}
 	
 	copy->align();
